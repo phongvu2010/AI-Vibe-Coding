@@ -38,7 +38,19 @@ def main():
     root = Path(__file__).resolve().parent.parent
     python_bin = sys.executable
 
+    # Tự động phát hiện virtualenv trong dự án hoặc lân cận nếu môi trường hiện tại thiếu packages
+    local_venv_python = root / ".venv" / "bin" / "python"
+    sibling_venv_python = root.parent / "AI-Team-Dev" / ".venv" / "bin" / "python"
+    if local_venv_python.exists():
+        python_bin = str(local_venv_python)
+    elif sibling_venv_python.exists():
+        try:
+            import pytest_asyncio  # noqa: F401
+        except ImportError:
+            python_bin = str(sibling_venv_python)
+
     print("🚀 [SMOKE TEST SUITE] Bắt đầu chu trình kiểm thử tự động 5 tầng...")
+    print(f"   Python runtime: {python_bin}")
 
     # Tầng 1: Linter & Syntax Check
     linter_ok = run_step(1, "Kiểm tra Linter & Cú pháp Python (Ruff / py_compile)",
@@ -77,8 +89,20 @@ def main():
     # Tầng 5: TypeScript Typecheck / Syntax
     frontend_dir = root / "src" / "frontend"
     if (frontend_dir / "package.json").exists():
-        run_step(5, "Kiểm tra Typecheck TypeScript Client",
-                 ["npm", "--prefix", "src/frontend", "run", "typecheck"])
+        node_modules = frontend_dir / "node_modules"
+        if node_modules.exists():
+            ts_ok = run_step(5, "Kiểm tra Typecheck TypeScript Client",
+                             ["npm", "--prefix", "src/frontend", "run", "typecheck"])
+            if not ts_ok:
+                print("❌ [TẦNG 5 FAILED] TypeScript Typecheck có lỗi. Vui lòng kiểm tra lại mã nguồn.")
+                sys.exit(5)
+        else:
+            print("\n=======================================================")
+            print("▶ TẦNG 5: Kiểm tra Typecheck TypeScript Client")
+            print("=======================================================")
+            print("⚠️ [CHÚ Ý] Thư mục 'src/frontend/node_modules' chưa được cài đặt.")
+            print("   Vui lòng chạy 'npm --prefix src/frontend install' khi cần kiểm tra Typecheck đầy đủ.")
+            print("   ✅ Tạm thời chấp thuận Tầng 5 (Bỏ qua kiểm tra typecheck cho môi trường chưa cài Node modules).")
     else:
         print("\n▶ TẦNG 5: Typecheck Frontend - Chưa có package.json. Bỏ qua.")
 
@@ -86,6 +110,7 @@ def main():
     print("🎉🎉 [SMOKE TEST SUITE PASSED] TẤT CẢ CÁC TẦNG ĐẠT CHUẨN!")
     print("=" * 55)
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,8 @@
 .PHONY: help dev test smoke contracts migrations snapshot release docker-up docker-down seed clean \
-        frontend-status preset-vite preset-nextjs add-mobile checkpoint checkpoints resume restore
+        frontend-status preset-vite preset-nextjs add-mobile checkpoint checkpoints resume restore \
+        agents-check agents-list
 
+PYTHON ?= python3
 PHASE ?= discovery
 STATUS ?= APPROVED
 NOTE ?= Checkpoint tự động
@@ -21,6 +23,10 @@ help:
 	@echo "  make docker-up       : Khởi động toàn bộ dịch vụ qua Docker Compose"
 	@echo "  make docker-down     : Dừng toàn bộ Docker containers"
 	@echo "  make clean           : Xóa sạch bytecode, cache và files tạm thời"
+	@echo ""
+	@echo "  --- TÁC TỬ & SUBAGENTS ANTIGRAVITY 2.0 ---"
+	@echo "  make agents-check    : Xác thực 20 Subagents & Squad specs trong .agents/agents/"
+	@echo "  make agents-list     : Liệt kê danh sách và vai trò của 5 Sub-Teams"
 	@echo ""
 	@echo "  --- TINH HOA 1: PRESETS & CLIENT ARCHITECTURE ---"
 	@echo "  make frontend-status : Kiểm tra trạng thái hiện tại của Web & Mobile Client"
@@ -108,3 +114,10 @@ resume:
 
 restore:
 	@python3 scripts/checkpoint.py restore $(ID)
+
+# --- Subagents Antigravity 2.0 ---
+agents-check:
+	@python3 scripts/register_agents.py --validate
+
+agents-list:
+	@python3 scripts/register_agents.py --list

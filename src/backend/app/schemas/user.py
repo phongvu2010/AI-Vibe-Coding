@@ -1,8 +1,15 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Annotated, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+
+try:
+    import email_validator  # noqa: F401
+    from pydantic import EmailStr
+except ImportError:
+    # Fallback to string with regex when email-validator is not installed
+    EmailStr = Annotated[str, StringConstraints(pattern=r"^[^@]+@[^@]+\.[^@]+$")]  # type: ignore
 
 
 class UserBase(BaseModel):

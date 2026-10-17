@@ -80,8 +80,24 @@ Tài liệu này là chỉ dẫn tối cao cho **Tech Lead (Main Agent)** và h�
 
 ## 🔄 3. Giao Thức Điều Phối Giữa Tech Lead & Subagents (Dispatch Protocol)
 
-1. **Khởi động Subagent**: Tech Lead sử dụng `invoke_subagent` truyền `TypeName` (ví dụ: `lead-ba` hoặc squad `discovery-squad`), `Role`, và `Prompt` mục tiêu rõ ràng kèm đường dẫn tài liệu.
+1. **Khởi động Subagent trên Antigravity 2.0**:
+   - **Phương Thức 1 (Khuyến Nghị Natively — Triệu hồi Direct Persona qua `self`)**:
+     Tech Lead gọi `invoke_subagent` với `TypeName: "self"`, cấu hình `Role`, `Model` (theo `config/model_router.yaml`) và chỉ đạo subagent nạp vai trò persona cùng rào chắn từ `.agents/agents/<agent-id>.md`:
+     ```python
+     invoke_subagent(
+         Subagents=[{
+             "TypeName": "self",
+             "Role": "Lead Business Analyst",
+             "Model": "pro",
+             "Prompt": "Đảm nhiệm vai trò @lead-ba. Đọc cẩm nang tại .agents/agents/lead-ba.md và quy chuẩn .agents/rules/coding_standards.md. Nhiệm vụ: Phỏng vấn 1-3 câu hỏi P0 bằng ask_question và lập PRD cho feature <feature-slug>."
+         }]
+     )
+     ```
+   - **Phương Thức 2 (Dynamic Registration qua `define_subagent`)**:
+     Tech Lead đọc nội dung file `.agents/agents/<agent-id>.md` và gọi `define_subagent` để đăng ký định danh chính thức vào phiên làm việc trước khi gọi `invoke_subagent(TypeName="<agent-id>")`. Xác thực danh sách bằng: `python3 scripts/register_agents.py --validate`.
+
 2. **Theo dõi Tiến độ**: Antigravity 2.0 tự động kích hoạt resume khi subagent hoàn thành, Tech Lead KHÔNG polling lặp.
+
 3. **Phản hồi Lỗi & Tự Sửa (Self-Healing Dispatch)**:
    - Khi QA hoặc Code Review phát hiện lỗi, Tech Lead sử dụng mẫu tin:
      ```markdown
@@ -91,12 +107,15 @@ Tài liệu này là chỉ dẫn tối cao cho **Tech Lead (Main Agent)** và h�
      <15-25 lines traceback>
      Yêu cầu: Khắc phục lỗi và phản hồi [FIX-COMPLETED] kèm danh sách file đã sửa.
      ```
+
 4. **Lưu Checkpoint & Quản Trị Phiên Làm Việc (State Checkpoint & Session Resume Protocol)**:
    - Ngay sau khi vượt qua mỗi Quality Gate (Gate 1, Gate 2, Gate 3) hoặc trước khi refactor lớn, Tech Lead tự động lưu checkpoint:
      ```bash
-     python scripts/checkpoint.py save --phase <phase_name> --status APPROVED --note "<tóm tắt kết quả gate>"
+     python3 scripts/checkpoint.py save --phase <phase_name> --status APPROVED --note "<tóm tắt kết quả gate>"
+     # hoặc dùng phím tắt: make checkpoint PHASE=<phase_name> NOTE="..."
      ```
-   - Khi phiên làm việc bị gián đoạn hoặc User yêu cầu tiếp tục, Tech Lead chạy `python scripts/checkpoint.py resume` để định hướng bước tiếp theo.
-   - Nếu phát sinh lỗi nghiêm trọng, Tech Lead khôi phục mã nguồn an toàn qua `python scripts/checkpoint.py restore <checkpoint_id>`.
+   - Khi phiên làm việc bị gián đoạn hoặc User yêu cầu tiếp tục, Tech Lead chạy `python3 scripts/checkpoint.py resume` (hoặc `make resume`) để định hướng bước tiếp theo.
+   - Nếu phát sinh lỗi nghiêm trọng, Tech Lead khôi phục mã nguồn an toàn qua `python3 scripts/checkpoint.py restore <checkpoint_id>` (hoặc `make restore ID=...`).
+
 5. **Dọn dẹp Tài nguyên (Subagent Lifecycle Cleanup)**:
    - Khi một Phase hoặc Feature kết thúc, Tech Lead chủ động gọi `manage_subagents(Action="kill_all")` để giải phóng bộ nhớ và giữ workspace luôn sạch sẽ.
