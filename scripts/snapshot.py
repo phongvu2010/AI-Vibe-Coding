@@ -6,7 +6,6 @@ Tự động lọc bỏ các thư mục rác (node_modules, .venv, __pycache__, 
 """
 
 import datetime
-import os
 import sys
 import tarfile
 from pathlib import Path

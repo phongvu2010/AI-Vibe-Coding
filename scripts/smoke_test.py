@@ -38,16 +38,13 @@ def main():
     root = Path(__file__).resolve().parent.parent
     python_bin = sys.executable
 
-    # Tự động phát hiện virtualenv trong dự án hoặc lân cận nếu môi trường hiện tại thiếu packages
-    local_venv_python = root / ".venv" / "bin" / "python"
-    sibling_venv_python = root.parent / "AI-Team-Dev" / ".venv" / "bin" / "python"
-    if local_venv_python.exists():
-        python_bin = str(local_venv_python)
-    elif sibling_venv_python.exists():
-        try:
-            import pytest_asyncio  # noqa: F401
-        except ImportError:
-            python_bin = str(sibling_venv_python)
+    # Tự động phát hiện virtualenv cục bộ trong dự án nếu có
+    local_venv_posix = root / ".venv" / "bin" / "python"
+    local_venv_win = root / ".venv" / "Scripts" / "python.exe"
+    if local_venv_posix.exists():
+        python_bin = str(local_venv_posix)
+    elif local_venv_win.exists():
+        python_bin = str(local_venv_win)
 
     print("🚀 [SMOKE TEST SUITE] Bắt đầu chu trình kiểm thử tự động 5 tầng...")
     print(f"   Python runtime: {python_bin}")
@@ -82,6 +79,9 @@ def main():
         test_ok = run_step(4, "Kiểm thử Đơn vị & Tích hợp Backend (Pytest Isolated)",
                            [python_bin, "-m", "pytest", "-v", "src/backend/tests"])
         if not test_ok:
+            print("\n💡 [HƯỚNG DẪN KHẮC PHỤC] Nếu gặp lỗi thiếu thư viện kiểm thử (pytest-asyncio, aiosqlite):")
+            print("   Vui lòng khởi tạo môi trường và cài đặt dev dependencies:")
+            print("   👉 pip install -e '.[dev]' (hoặc chạy: make setup)")
             sys.exit(4)
     else:
         print("\n▶ TẦNG 4: Kiểm thử Backend - Chưa có test cases trong src/backend/tests. Bỏ qua.")

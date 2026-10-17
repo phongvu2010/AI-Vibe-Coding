@@ -17,6 +17,7 @@ function Show-Help {
     Write-Host "          AI-Vibe-Coding — Bộ Tự Động Hóa Cho Windows (PowerShell)       " -ForegroundColor Cyan
     Write-Host "========================================================================" -ForegroundColor Cyan
     Write-Host "  --- THỰC THI & KIỂM THỬ ---"
+    Write-Host "  .\run.ps1 setup           : Khởi tạo virtualenv .venv và cài đặt dependencies"
     Write-Host "  .\run.ps1 dev             : Khởi chạy Backend FastAPI (Uvicorn reload)"
     Write-Host "  .\run.ps1 test            : Chạy kiểm thử Pytest trên SQLite in-memory"
     Write-Host "  .\run.ps1 smoke           : Chạy bộ kiểm thử tự động 5 tầng (smoke_test.py)"
@@ -42,6 +43,12 @@ function Show-Help {
 }
 
 switch ($Command.ToLower()) {
+    "setup" {
+        Write-Host "📦 Đang khởi tạo môi trường ảo và cài đặt dependencies..." -ForegroundColor Green
+        python -m venv .venv
+        .\.venv\Scripts\python.exe -m pip install --upgrade pip
+        .\.venv\Scripts\pip.exe install -e ".[dev]"
+    }
     "dev" {
         Write-Host "🚀 Đang khởi động Backend FastAPI..." -ForegroundColor Green
         python -m uvicorn src.backend.app.main:app --reload --port 8000

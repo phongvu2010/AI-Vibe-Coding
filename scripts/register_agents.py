@@ -130,7 +130,7 @@ def validate_agents(agents: List[Dict[str, Any]]) -> bool:
     if all_ok:
         print(f"🎉 [VALIDATION PASSED] Toàn bộ {len(agents)} subagent specs đạt chuẩn Antigravity 2.0!")
     else:
-        print(f"⚠️ Phát hiện lỗi trong cấu hình tác tử. Vui lòng khắc phục.")
+        print("⚠️ Phát hiện lỗi trong cấu hình tác tử. Vui lòng khắc phục.")
     print("=" * 72)
     return all_ok
 

@@ -13,6 +13,7 @@ help:
 	@echo "          AI-Vibe-Coding — Bộ Tự Động Hóa 1-Chạm cho Tech Lead          "
 	@echo "========================================================================"
 	@echo "  --- THỰC THI & KIỂM THỬ ---"
+	@echo "  make setup           : Khởi tạo virtualenv .venv và cài đặt dependencies đầy đủ"
 	@echo "  make dev             : Khởi chạy Backend FastAPI (Uvicorn reload)"
 	@echo "  make test            : Chạy kiểm thử Pytest trên SQLite in-memory cô lập"
 	@echo "  make smoke           : Chạy bộ kiểm thử tự động 5 tầng (smoke_test.py)"
@@ -41,6 +42,12 @@ help:
 	@echo "  make restore ID=...  : Khôi phục mã nguồn và trạng thái về checkpoint cụ thể"
 	@echo "  make snapshot        : Chụp nhanh mã nguồn phòng ngừa rủi ro"
 	@echo "========================================================================"
+
+setup:
+	@echo "📦 Đang khởi tạo môi trường ảo và cài đặt dependencies..."
+	python3 -m venv .venv
+	./.venv/bin/pip install --upgrade pip
+	./.venv/bin/pip install -e ".[dev]"
 
 dev:
 	@echo "🚀 Đang khởi động Backend FastAPI..."
