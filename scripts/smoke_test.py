@@ -5,15 +5,16 @@ Bộ kiểm thử tự động 5 tầng 1-chạm (5-Layer Automated Smoke Test S
 Được kích hoạt bởi QA Tester (qa-tester) và Tech Lead để thẩm định chất lượng toàn dự án.
 """
 
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
+
 def run_step(step_num: int, title: str, cmd: list) -> bool:
-    print(f"\n=======================================================")
+    print("\n=======================================================")
     print(f"▶ TẦNG {step_num}: {title}")
     print(f"  Lệnh thực thi: {' '.join(cmd)}")
-    print(f"=======================================================")
+    print("=======================================================")
     try:
         res = subprocess.run(cmd, capture_output=True, text=True)
         if res.stdout:
@@ -38,9 +39,9 @@ def main():
     python_bin = sys.executable
 
     print("🚀 [SMOKE TEST SUITE] Bắt đầu chu trình kiểm thử tự động 5 tầng...")
-    
+
     # Tầng 1: Linter & Syntax Check
-    linter_ok = run_step(1, "Kiểm tra Linter & Cú pháp Python (Ruff / py_compile)", 
+    linter_ok = run_step(1, "Kiểm tra Linter & Cú pháp Python (Ruff / py_compile)",
                          [python_bin, "-m", "ruff", "check", "src/"])
     if not linter_ok:
         # Thử fallback bằng py_compile

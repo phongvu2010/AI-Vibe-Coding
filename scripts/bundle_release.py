@@ -5,13 +5,14 @@ Bộ tự động hóa đóng gói phát hành phần mềm (Automated Release B
 Tạo gói zip hoàn chỉnh, tính toán mã băm SHA256, và xuất bản RELEASE_MANIFEST.json bàn giao cho khách hàng.
 """
 
-import sys
-import json
-import zipfile
-import hashlib
 import datetime
+import hashlib
+import json
 import subprocess
+import sys
+import zipfile
 from pathlib import Path
+
 
 def get_git_commit(root: Path) -> str:
     try:
@@ -42,7 +43,7 @@ def bundle(feature_slug: str, version: str = "1.0.0"):
 
     # Các thư mục và file đưa vào bản phát hành
     include_paths = ["src", "scripts", "docs", "config", "docker-compose.yml", "Makefile", "pyproject.toml", ".env.example"]
-    
+
     file_manifest = []
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
         for item in include_paths:
@@ -85,7 +86,7 @@ def bundle(feature_slug: str, version: str = "1.0.0"):
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest_data, f, indent=2, ensure_ascii=False)
 
-    print(f"✅ [RELEASE BUNDLER] Đóng gói thành công!")
+    print("✅ [RELEASE BUNDLER] Đóng gói thành công!")
     print(f"   • File zip: {zip_path}")
     print(f"   • SHA256  : {package_sha256}")
     print(f"   • Manifest: {manifest_path}")

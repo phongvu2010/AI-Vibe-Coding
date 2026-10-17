@@ -5,10 +5,10 @@ Kiểm tra đồng bộ hợp đồng dữ liệu đa tầng (Cross-Layer Data C
 Bảo đảm tính nhất quán 100% về tên trường (snake_case) giữa DB, Backend Schemas và Frontend/Mobile Types.
 """
 
-import os
-import sys
 import re
+import sys
 from pathlib import Path
+
 
 def is_snake_case(name: str) -> bool:
     if name.startswith("_"):
@@ -33,7 +33,7 @@ def extract_db_fields(models_dir: Path) -> dict:
                 current_model = class_match.group(1)
                 fields_by_model[current_model] = set()
                 continue
-            
+
             # Tìm thuộc tính mapped_column hoặc Column
             if current_model and ("mapped_column(" in line_str or "Column(" in line_str):
                 col_match = re.match(r"^([a-z0-9_]+)\s*[:=]", line_str)
@@ -59,7 +59,7 @@ def extract_schema_fields(schemas_dir: Path) -> dict:
                 current_schema = class_match.group(1)
                 fields_by_schema[current_schema] = set()
                 continue
-            
+
             if current_schema and ":" in line_str and not line_str.startswith("def ") and not line_str.startswith("#"):
                 field_match = re.match(r"^([a-zA-Z0-9_]+)\s*:", line_str)
                 if field_match:
@@ -82,7 +82,7 @@ def extract_ts_interfaces(types_dir: Path) -> dict:
                 current_iface = iface_match.group(1)
                 fields_by_interface[current_iface] = set()
                 continue
-            
+
             if current_iface:
                 if line_str.startswith("}"):
                     current_iface = None

@@ -5,8 +5,8 @@ Cắt tỉa log lỗi (Traceback Trimmer) cho vòng lặp Self-Healing.
 Giúp thu gọn log kiểm thử còn 15-25 dòng trọng tâm nhất để tránh làm phình ngữ cảnh (token context).
 """
 
-import sys
 import re
+import sys
 
 MAX_LINES = 25
 
@@ -18,19 +18,19 @@ def trim_traceback(raw_text: str) -> str:
     # Tìm các dòng liên quan trực tiếp đến src/ và thông báo lỗi cuối cùng
     relevant_lines = []
     error_summary = []
-    
+
     in_traceback = False
     for line in lines:
         if "Traceback (most recent call last):" in line or "FAILED " in line:
             in_traceback = True
-        
+
         if in_traceback:
             # Ưu tiên các dòng liên quan đến src/ hoặc tests/
             if any(k in line for k in ["src/", "tests/", "AssertionError", "Error:", "Exception:"]):
                 relevant_lines.append(line)
             elif line.startswith("E   ") or line.startswith(">   "):
                 relevant_lines.append(line)
-        
+
         # Bắt thông báo lỗi tổng kết cuối cùng
         if re.search(r"^(AssertionError|ValueError|TypeError|KeyError|HTTPException|Exception):", line):
             error_summary.append(line)

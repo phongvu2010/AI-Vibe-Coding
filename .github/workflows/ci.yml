@@ -1,0 +1,52 @@
+name: AI-Vibe-Coding Continuous Integration
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  quality-gate:
+    name: 5-Layer Quality Gate & Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Tầng 1 - Linter & Syntax Check (Ruff)
+        run: |
+          python -m ruff check src/ scripts/
+
+      - name: Tầng 2 - Cross-Layer Contract Synchronization
+        run: |
+          python scripts/verify_contracts.py
+
+      - name: Tầng 3 - Migration DAG Integrity (Alembic)
+        run: |
+          python scripts/verify_migrations.py
+
+      - name: Tầng 4 - Backend & DB Tests (Pytest Isolated)
+        run: |
+          python -m pytest -v src/backend/tests
+
+      - name: Test Release Packaging
+        run: |
+          python scripts/bundle_release.py ci-build 1.0.0

@@ -5,9 +5,10 @@ Kiểm tra tính toàn vẹn của đồ thị phân nhánh Alembic Migration (M
 Đảm bảo không có nhánh mồ côi (orphan branches) hoặc đứt gãy chuỗi revisions.
 """
 
-import sys
 import re
+import sys
 from pathlib import Path
+
 
 def check_migrations():
     root = Path(__file__).resolve().parent.parent
@@ -30,10 +31,10 @@ def check_migrations():
         if file.name.startswith("__"):
             continue
         content = file.read_text(encoding="utf-8")
-        
+
         rev_match = re.search(r"revision\s*:\s*str\s*=\s*['\"]([^'\"]+)['\"]", content)
         down_match = re.search(r"down_revision\s*:\s*Union\[str,\s*None\]\s*=\s*(['\"][^'\"]+['\"]|None)", content)
-        
+
         if not rev_match:
             # Fallback pattern
             rev_match = re.search(r"revision\s*=\s*['\"]([^'\"]+)['\"]", content)
@@ -43,7 +44,7 @@ def check_migrations():
         if rev_match:
             rev_id = rev_match.group(1)
             revisions[rev_id] = file.name
-            
+
             down_id = None
             if down_match and down_match.group(1) != "None":
                 down_id = down_match.group(1).strip("'\"")
