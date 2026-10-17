@@ -67,7 +67,7 @@ Tài liệu này là chỉ dẫn tối cao cho **Tech Lead (Main Agent)** và h�
 | **`security-architect`**| Security Specialist | `docs/specs/<slug>/` | `view_file`, `write_to_file`, `replace_file_content` | Cấm chạy shell commands, cấm sửa code | `pro` |
 | **`tech-planner`** | Technical Planner | `docs/specs/<slug>/` | `view_file`, `write_to_file`, `replace_file_content` | Cấm chạy shell commands, cấm sửa code | `pro` |
 | **`db-dev`** | Database Specialist | `src/db/` | `python -m ruff check src/db/`, `python -m py_compile src/db/...`, `alembic` | Cấm `rm -rf`, cấm sửa `pyproject.toml`, cấm ghi file ngoài `src/db/` | `inherit` |
-| **`frontend-dev`** | Frontend & Mobile Dev | `src/frontend/`, `src/mobile/` | `npm --prefix src/frontend run typecheck`, `run lint`, `run build`, `npm --prefix src/mobile run typecheck` | Cấm `npm install` trần, cấm sửa `package.json`, cấm ghi file ngoài frontend/mobile | `inherit` |
+| **`frontend-dev`** | Frontend & Mobile Dev | `src/frontend/`, `src/mobile/` | `npm --prefix src/frontend run typecheck`, `run lint`, `run build`, `npm --prefix src/mobile run typecheck`, `python scripts/setup_frontend.py` | Cấm `npm install` trần, cấm sửa `package.json`, cấm ghi file ngoài frontend/mobile | `inherit` |
 | **`backend-dev`** | Backend Specialist | `src/backend/` | `python -m ruff check src/backend/`, `python -m py_compile src/backend/...` | Cấm `pip install` trần, cấm sửa `pyproject.toml`, cấm ghi ngoài `src/backend/` | `inherit` |
 | **`devops-engineer`** | DevOps & Cloud | `docker-compose.yml`, `scripts/` | `docker compose config`, `docker build` | Cấm xóa volume dữ liệu, cấm push cloud credentials | `flash` |
 | **`qa-tester`** | Automated QA Tester | `docs/specs/`, `tests/` | `python scripts/smoke_test.py`, `python scripts/verify_contracts.py`, `python scripts/verify_migrations.py`, `pytest`, `npm run typecheck` | Cấm tự ý sửa đổi mã nguồn nghiệp vụ `src/` | `flash` |
@@ -80,7 +80,7 @@ Tài liệu này là chỉ dẫn tối cao cho **Tech Lead (Main Agent)** và h�
 
 ## 🔄 3. Giao Thức Điều Phối Giữa Tech Lead & Subagents (Dispatch Protocol)
 
-1. **Khởi động Subagent**: Tech Lead sử dụng `invoke_subagent` truyền `TypeName` (ví dụ: `lead-ba`), `Role`, và `Prompt` mục tiêu rõ ràng kèm đường dẫn tài liệu.
+1. **Khởi động Subagent**: Tech Lead sử dụng `invoke_subagent` truyền `TypeName` (ví dụ: `lead-ba` hoặc squad `discovery-squad`), `Role`, và `Prompt` mục tiêu rõ ràng kèm đường dẫn tài liệu.
 2. **Theo dõi Tiến độ**: Antigravity 2.0 tự động kích hoạt resume khi subagent hoàn thành, Tech Lead KHÔNG polling lặp.
 3. **Phản hồi Lỗi & Tự Sửa (Self-Healing Dispatch)**:
    - Khi QA hoặc Code Review phát hiện lỗi, Tech Lead sử dụng mẫu tin:
@@ -91,5 +91,12 @@ Tài liệu này là chỉ dẫn tối cao cho **Tech Lead (Main Agent)** và h�
      <15-25 lines traceback>
      Yêu cầu: Khắc phục lỗi và phản hồi [FIX-COMPLETED] kèm danh sách file đã sửa.
      ```
-4. **Dọn dẹp Tài nguyên (Subagent Lifecycle Cleanup)**:
+4. **Lưu Checkpoint & Quản Trị Phiên Làm Việc (State Checkpoint & Session Resume Protocol)**:
+   - Ngay sau khi vượt qua mỗi Quality Gate (Gate 1, Gate 2, Gate 3) hoặc trước khi refactor lớn, Tech Lead tự động lưu checkpoint:
+     ```bash
+     python scripts/checkpoint.py save --phase <phase_name> --status APPROVED --note "<tóm tắt kết quả gate>"
+     ```
+   - Khi phiên làm việc bị gián đoạn hoặc User yêu cầu tiếp tục, Tech Lead chạy `python scripts/checkpoint.py resume` để định hướng bước tiếp theo.
+   - Nếu phát sinh lỗi nghiêm trọng, Tech Lead khôi phục mã nguồn an toàn qua `python scripts/checkpoint.py restore <checkpoint_id>`.
+5. **Dọn dẹp Tài nguyên (Subagent Lifecycle Cleanup)**:
    - Khi một Phase hoặc Feature kết thúc, Tech Lead chủ động gọi `manage_subagents(Action="kill_all")` để giải phóng bộ nhớ và giữ workspace luôn sạch sẽ.

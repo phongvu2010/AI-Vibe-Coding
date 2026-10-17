@@ -75,6 +75,12 @@ flowchart TD
 4. **Tối Ưu Chi Phí Token (Model Cost Routing Matrix)**:
    - Phân bổ 3 tầng mô hình: `pro` cho bài toán nhận thức sâu (BA, Architect, Reviewer), `flash` cho lặp nhanh (QA, UI, DevOps), `flash_lite` cho tài liệu/manifest (Release, Tech Writer), tiết kiệm 65-80% chi phí vận hành.
 
+5. **Kiến Trúc Client Linh Hoạt (Client Presets Scaffolding - Tinh hoa từ `AI-Team-Dev`)**:
+   - Chuyển đổi mượt mà giữa Web Next.js 15 (SSR/SEO) và React + Vite (SPA/Dashboard) hoặc khởi tạo Mobile React Native Expo qua `scripts/setup_frontend.py` (`make preset-vite`, `make preset-nextjs`, `make add-mobile`).
+
+6. **Quản Trị Trạng Thái SDLC & Phục Hồi Phiên (State Checkpoints & Rollback - Tinh hoa từ `Multi-Agents-Dev`)**:
+   - Tự động lưu checkpoint tại từng Quality Gate kèm bản chụp mã nguồn sạch (< 1s), hỗ trợ tiếp tục phiên làm việc (`make resume`) hoặc khôi phục mã nguồn an toàn khi gặp sự cố (`make restore ID=...`).
+
 ---
 
 ## 📁 Cấu Trúc Thư Mục Dự Án
@@ -85,14 +91,15 @@ AI-Vibe-Coding/
 ├── GEMINI.md                                # Quy chuẩn chỉ dẫn gốc cho Antigravity 2.0
 ├── WORKFLOW.md                              # SOP chi tiết quy trình 7 giai đoạn của công ty
 ├── USER_GUIDE.md                            # Cẩm nang hướng dẫn sử dụng chi tiết
-├── Makefile                                 # Bộ tự động hóa 1-chạm (dev, test, smoke, release)
+├── Makefile                                 # Bộ tự động hóa 1-chạm (dev, test, smoke, presets, checkpoints)
+├── run.ps1                                  # Bộ tự động hóa PowerShell cho Windows
 ├── docker-compose.yml                       # Khởi chạy Fullstack (PostgreSQL, Backend, Frontend)
 ├── pyproject.toml                           # Cấu hình dự án Python & dependencies
 ├── alembic.ini                              # Cấu hình database migrations
 ├── .env.example                             # Biến môi trường mẫu
 │
 ├── .agents/                                 # Hệ sinh thái Native Antigravity 2.0
-│   ├── agents/                              # 15 Subagents chuyên trách (.md)
+│   ├── agents/                              # 15 Subagents chuyên trách (.md) + 5 Squad Orchestrators
 │   ├── rules/                               # Quy chuẩn code, an ninh, review criteria
 │   └── skills/                              # Kỹ năng nghiệp vụ chuyên biệt (SKILL.md)
 │
@@ -101,8 +108,17 @@ AI-Vibe-Coding/
 │   ├── model_router.yaml
 │   └── quality_gates.yaml
 │
+├── templates/                               # Kho Presets Client kế thừa từ AI-Team-Dev
+│   └── presets/                             # Next.js 15, React Vite, React Native Expo
+│
 ├── docs/                                    # Hồ sơ bóc tách theo tính năng (docs/specs/<slug>/)
-├── scripts/                                 # Công cụ kiểm tra hợp đồng, migration, test runner, release
+├── scripts/                                 # Bộ công cụ tự động hóa Day-0, Checkpoints, Presets, Test & Release
+│   ├── setup_frontend.py                    # Chuyển đổi linh hoạt Web Vite / Next.js / Mobile Expo
+│   ├── checkpoint.py                        # Quản lý State Checkpoints, Session Resume & Rollback
+│   ├── snapshot.py                          # Chụp nhanh mã nguồn < 1s
+│   ├── smoke_test.py                        # Kiểm thử tự động 5 tầng
+│   └── bundle_release.py                    # Đóng gói bản phát hành (.zip, manifest, docs)
+│
 ├── src/                                     # Toàn bộ mã nguồn thực tế
 │   ├── db/                                  # SQLAlchemy 2.0 Async, Alembic, Repositories, Seeds
 │   ├── backend/                             # FastAPI Clean Architecture, Pydantic v2, Pytest
@@ -110,7 +126,10 @@ AI-Vibe-Coding/
 │   └── mobile/                              # React Native Expo, NativeWind Tailwind
 │
 ├── examples/                                # Đề bài thực tế mẫu (sample_client_brief.md)
-└── dist/                                    # Gói phát hành phần mềm (.zip, RELEASE_MANIFEST.json)
+└── dist/                                    # Gói phát hành & Checkpoint lưu trữ
+    ├── checkpoints/                         # SDLC State Checkpoints & LATEST_CHECKPOINT.json
+    ├── snapshots/                           # Các bản lưu trữ mã nguồn .tar.gz
+    └── releases/                            # Gói phát hành phần mềm hoàn chỉnh (.zip)
 ```
 
 ---

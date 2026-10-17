@@ -16,9 +16,10 @@ quality_gates:
       - id: "G1-04"
         item: "User stories định dạng Gherkin (Given-When-Then) có ít nhất 1 Happy path và 2 Edge cases"
         mandatory: true
-      - id: "G1-05"
-        item: "ui_ux_spec.md có sơ đồ Mermaid và quy chuẩn 5 UI states"
+      - id: "G1-06"
+        item: "Xác nhận kiến trúc Client mục tiêu (Web Next.js / Vite và Mobile Expo qua setup_frontend.py)"
         mandatory: true
+    post_action: "python scripts/checkpoint.py save --phase gate_1_prd --status APPROVED --note 'Gate 1 Sign-off hoàn tất'"
 
   gate_2_architecture_signoff:
     name: "Quality Gate 2: Architecture & Technical Contract Sign-off"
@@ -40,6 +41,7 @@ quality_gates:
       - id: "G2-05"
         item: "Ma trận đe dọa STRIDE và phân quyền RBAC/ABAC được xác lập"
         mandatory: true
+    post_action: "python scripts/checkpoint.py save --phase gate_2_architecture --status APPROVED --note 'Gate 2 Sign-off hoàn tất'"
 
   gate_3_production_readiness:
     name: "Quality Gate 3: Production Readiness & Quality Sign-off"
@@ -64,3 +66,4 @@ quality_gates:
       - id: "G3-06"
         item: "Điểm Code Review đạt tối thiểu 85/100, zero lỗ hổng bảo mật nghiêm trọng"
         mandatory: true
+    post_action: "python scripts/checkpoint.py save --phase gate_3_deploy --status APPROVED --note 'Gate 3 Sign-off hoàn tất'"
