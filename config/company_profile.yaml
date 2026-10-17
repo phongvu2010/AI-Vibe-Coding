@@ -1,0 +1,43 @@
+company:
+  name: "AI-Vibe-Coding Software House"
+  tagline: "Autonomous Multi-Agent Software Development Agency on Antigravity 2.0"
+  version: "1.0.0"
+
+engineering_standards:
+  backend:
+    framework: "FastAPI"
+    min_version: "0.110.0"
+    python_version: "3.11+"
+    orm: "SQLAlchemy 2.0 (Async Declarative Mapped)"
+    validation: "Pydantic v2"
+    migrations: "Alembic"
+    architecture: "Clean Architecture (models -> schemas -> repositories -> services -> routers)"
+    testing: "pytest + pytest-asyncio (SQLite in-memory fallback)"
+    linter: "ruff"
+
+  frontend:
+    framework_web: "Next.js 15 (App Router + React 19) / React Vite"
+    framework_mobile: "React Native Expo SDK 51+ (NativeWind v4)"
+    language: "TypeScript (Strict mode)"
+    styling: "Tailwind CSS"
+    casing: "snake_case (strictly synchronized with Backend/DB)"
+    ui_states_required:
+      - "default"
+      - "loading"
+      - "empty"
+      - "error"
+      - "success"
+
+  database:
+    production: "PostgreSQL 16+"
+    local_testing: "SQLite (async in-memory isolated)"
+    primary_key: "UUID (generated in Python via uuid.uuid4)"
+    json_support: "Native JSON type"
+
+guardrails:
+  max_healing_loops: 3
+  circuit_breaker_enabled: true
+  traceback_max_lines: 25
+  min_code_review_score: 85
+  enforce_contract_sync: true
+  zero_hardcoded_secrets: true

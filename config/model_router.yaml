@@ -1,0 +1,80 @@
+# Model Routing & Token Cost Optimization Matrix
+# Tối ưu hóa 65% - 80% chi phí token bằng cách phân bổ mô hình chính xác theo khối lượng nhận thức.
+
+tiers:
+  pro:
+    model_name: "gemini-2.5-pro"
+    target_tasks:
+      - "Phân tích yêu cầu nghiệp vụ chuyên sâu và kịch bản góc"
+      - "Thiết kế kiến trúc hệ thống và mô hình dữ liệu quan hệ"
+      - "Đánh giá mô hình đe dọa STRIDE và bảo mật OWASP"
+      - "Thẩm định chất lượng mã nguồn và phát hiện lỗi tiềm ẩn"
+  flash:
+    model_name: "gemini-2.5-flash"
+    target_tasks:
+      - "Tiếp nhận và phân loại yêu cầu sơ bộ"
+      - "Thiết kế luồng màn hình UI/UX và tokens"
+      - "Thực thi kiểm thử tự động 5 tầng và phân tích lỗi"
+      - "Cấu hình Docker và DevOps scripts"
+  flash_lite:
+    model_name: "gemini-2.5-flash-lite"
+    target_tasks:
+      - "Đóng gói mã nguồn và tạo checksum manifest"
+      - "Soạn thảo hướng dẫn sử dụng và tài liệu triển khai"
+      - "Tạo ghi chú phát hành (Changelog)"
+
+agents_allocation:
+  # Sub-Team 1: Discovery & Solutions
+  account-lead:
+    tier: "flash"
+    rationale: "Tốc độ phản hồi nhanh, phân loại yêu cầu sơ bộ"
+  lead-ba:
+    tier: "pro"
+    rationale: "Phân tích logic nghiệp vụ sâu, xử lý mâu thuẫn yêu cầu và Gherkin user stories"
+  uiux-designer:
+    tier: "flash"
+    rationale: "Thiết kế sơ đồ Mermaid và ma trận trạng thái UI"
+
+  # Sub-Team 2: Architecture & Planning
+  system-architect:
+    tier: "pro"
+    rationale: "Thiết kế phân tầng Clean Architecture và mô hình ERD"
+  security-architect:
+    tier: "pro"
+    rationale: "Phân tích nguy cơ bảo mật STRIDE và ma trận phân quyền"
+  tech-planner:
+    tier: "pro"
+    rationale: "Đảm bảo tính chính xác tuyệt đối của Cross-Layer Contract Matrix"
+
+  # Sub-Team 3: Core Engineering
+  db-dev:
+    tier: "inherit"
+    rationale: "Thừa hưởng mô hình của Tech Lead để duy trì độ tương thích"
+  frontend-dev:
+    tier: "inherit"
+    rationale: "Thừa hưởng mô hình của Tech Lead"
+  backend-dev:
+    tier: "inherit"
+    rationale: "Thừa hưởng mô hình của Tech Lead"
+  devops-engineer:
+    tier: "flash"
+    rationale: "Tập trung sinh cấu hình Docker và scripts tự động hóa"
+
+  # Sub-Team 4: QA & Security Audit
+  qa-tester:
+    tier: "flash"
+    rationale: "Tiết kiệm 60% latency và chi phí trong các vòng lặp kiểm thử tự động"
+  code-reviewer:
+    tier: "pro"
+    rationale: "Audit diff chuyên sâu, phát hiện N+1 query và lỗ hổng OWASP"
+
+  # Sub-Team 5: Release & Handover
+  release-engineer:
+    tier: "flash_lite"
+    rationale: "Tác vụ đóng gói manifest và tính checksum tiết kiệm tối đa token"
+  tech-writer:
+    tier: "flash_lite"
+    rationale: "Soạn thảo tài liệu markdown theo mẫu có sẵn"
+  handover-lead:
+    tier: "flash"
+    rationale: "Tổng hợp kết quả nghiệm thu UAT và hướng dẫn người dùng"

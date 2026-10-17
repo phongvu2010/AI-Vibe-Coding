@@ -1,0 +1,66 @@
+quality_gates:
+  gate_1_client_signoff:
+    name: "Quality Gate 1: Client Scope & PRD Sign-off"
+    responsible: "lead-ba"
+    approver: "Product Owner / Client (User)"
+    checklist:
+      - id: "G1-01"
+        item: "T-Shirt sizing rõ ràng (Atomic Size S/M hoặc Epic decomposed)"
+        mandatory: true
+      - id: "G1-02"
+        item: "Phỏng vấn tối đa 1-3 câu hỏi P0 bằng công cụ ask_question hoàn tất"
+        mandatory: true
+      - id: "G1-03"
+        item: "PRD.md có mục tiêu SMART, User Personas, Functional & Non-Functional matrix"
+        mandatory: true
+      - id: "G1-04"
+        item: "User stories định dạng Gherkin (Given-When-Then) có ít nhất 1 Happy path và 2 Edge cases"
+        mandatory: true
+      - id: "G1-05"
+        item: "ui_ux_spec.md có sơ đồ Mermaid và quy chuẩn 5 UI states"
+        mandatory: true
+
+  gate_2_architecture_signoff:
+    name: "Quality Gate 2: Architecture & Technical Contract Sign-off"
+    responsible: "tech-planner"
+    approver: "Tech Lead & System Architect"
+    checklist:
+      - id: "G2-01"
+        item: "Kiến trúc tuân thủ Clean Architecture phân tầng triệt để"
+        mandatory: true
+      - id: "G2-02"
+        item: "Sơ đồ quan hệ ERD đầy đủ các bảng, quan hệ 1-N, N-N và chỉ mục (indexes)"
+        mandatory: true
+      - id: "G2-03"
+        item: "Cross-Layer Data Contract Matrix khớp 100% field names (snake_case) giữa DB, Backend, Frontend"
+        mandatory: true
+      - id: "G2-04"
+        item: "Đặc tả REST API endpoints và Error Schemas chuẩn {'detail': '...'}"
+        mandatory: true
+      - id: "G2-05"
+        item: "Ma trận đe dọa STRIDE và phân quyền RBAC/ABAC được xác lập"
+        mandatory: true
+
+  gate_3_production_readiness:
+    name: "Quality Gate 3: Production Readiness & Quality Sign-off"
+    responsible: "code-reviewer"
+    approver: "Tech Lead"
+    checklist:
+      - id: "G3-01"
+        item: "Linter ruff check src/ đạt 0 lỗi"
+        mandatory: true
+      - id: "G3-02"
+        item: "verify_contracts.py xác nhận đồng bộ 100% contracts"
+        mandatory: true
+      - id: "G3-03"
+        item: "verify_migrations.py xác nhận Alembic migration DAG nguyên vẹn"
+        mandatory: true
+      - id: "G3-04"
+        item: "Pytest Backend & DB tests đạt tỷ lệ đỗ 100%"
+        mandatory: true
+      - id: "G3-05"
+        item: "TypeScript typecheck (npm run typecheck) không có lỗi"
+        mandatory: true
+      - id: "G3-06"
+        item: "Điểm Code Review đạt tối thiểu 85/100, zero lỗ hổng bảo mật nghiêm trọng"
+        mandatory: true
