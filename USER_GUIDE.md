@@ -121,7 +121,8 @@ make restore ID=CP_20261017_172129_gate_1_prd
 | `make migrations`| Kiểm tra đồ thị phân nhánh Alembic Migration DAG. |
 | `make seed` | Nạp dữ liệu mẫu ban đầu vào database. |
 | `make release` | Đóng gói bản phát hành `.zip` kèm checksum manifest. |
-| `make docker-up` | Khởi chạy toàn bộ hệ thống bằng Docker Compose. |
+| `make docker-up` | Khởi chạy dịch vụ lõi (PostgreSQL + Backend) bằng Docker Compose. |
+| `make docker-fullstack` | Khởi chạy toàn bộ hệ thống Fullstack (PostgreSQL + Backend + Frontend). |
 | `make clean` | Dọn dẹp sạch cache và bytecode rác. |
 | **`make frontend-status`** | Kiểm tra trạng thái framework Web & Mobile hiện tại. |
 | **`make preset-vite`** | Chuyển đổi Web Frontend sang React + Vite. |

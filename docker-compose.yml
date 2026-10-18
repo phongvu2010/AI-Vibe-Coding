@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:16-alpine
@@ -33,6 +31,24 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: vibe_frontend
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8000/api/v1
+      PORT: "3000"
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    profiles:
+      - frontend
+      - fullstack
 
 volumes:
   postgres_data:

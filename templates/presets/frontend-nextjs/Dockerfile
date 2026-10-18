@@ -1,6 +1,6 @@
 # ==============================================================================
 # Next.js 15 Production Multi-Stage Dockerfile (`src/frontend/Dockerfile`)
-# Multi-Agent Dev Team — Antigravity 2.0
+# AI-Vibe-Coding — Antigravity 2.0
 # Output: Standalone (~110MB ultra-lightweight image)
 # ==============================================================================
 
@@ -11,8 +11,8 @@ WORKDIR /app
 # Install libc6-compat for Alpine compatibility with SWC / Turbopack
 RUN apk add --no-cache libc6-compat
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json package-lock.json* ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Stage 2: Build Next.js application in standalone mode
 FROM node:20-alpine AS builder
