@@ -1,8 +1,14 @@
 quality_gates:
   gate_1_client_signoff:
+    id: "gate_1_prd_approval"
     name: "Quality Gate 1: Client Scope & PRD Sign-off"
     responsible: "lead-ba"
     approver: "Product Owner / Client (User)"
+    role_required: "Product Owner / Client Lead"
+    blocking: true
+    artifacts_to_review:
+      - "docs/specs/{slug}/prd.md"
+      - "docs/specs/{slug}/ui_concept.md"
     checklist:
       - id: "G1-01"
         item: "T-Shirt sizing rõ ràng (Atomic Size S/M hoặc Epic decomposed)"
@@ -22,9 +28,16 @@ quality_gates:
     post_action: "python scripts/checkpoint.py save --phase gate_1_prd --status APPROVED --note 'Gate 1 Sign-off hoàn tất'"
 
   gate_2_architecture_signoff:
+    id: "gate_2_architecture_signoff"
     name: "Quality Gate 2: Architecture & Technical Contract Sign-off"
     responsible: "tech-planner"
     approver: "Tech Lead & System Architect"
+    role_required: "Tech Lead / Principal Architect"
+    blocking: true
+    artifacts_to_review:
+      - "docs/specs/{slug}/plan.md"
+      - "docs/specs/{slug}/openapi.yaml"
+      - "docs/specs/{slug}/erd.mermaid"
     checklist:
       - id: "G2-01"
         item: "Kiến trúc tuân thủ Clean Architecture phân tầng triệt để"
@@ -44,9 +57,16 @@ quality_gates:
     post_action: "python scripts/checkpoint.py save --phase gate_2_architecture --status APPROVED --note 'Gate 2 Sign-off hoàn tất'"
 
   gate_3_production_readiness:
+    id: "gate_3_deploy_signoff"
     name: "Quality Gate 3: Production Readiness & Quality Sign-off"
     responsible: "code-reviewer"
     approver: "Tech Lead"
+    role_required: "Tech Lead / Release Manager"
+    blocking: true
+    artifacts_to_review:
+      - "docs/specs/{slug}/test-report.md"
+      - "docs/specs/{slug}/review-report.md"
+      - "docs/specs/{slug}/UAT_CHECKLIST.md"
     checklist:
       - id: "G3-01"
         item: "Linter ruff check src/ đạt 0 lỗi"

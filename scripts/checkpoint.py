@@ -45,6 +45,46 @@ PHASE_LABELS = {
     "gate_3_deploy": "GATE 3: Production Readiness Sign-off",
     "release_handover": "5. Release & Client Handover (Sub-Team 5)",
     "completed": "✅ Hoàn tất toàn bộ chu trình SDLC",
+    "pre_clean": "🧹 Chuẩn bị dọn sạch đón đề bài mới",
+}
+
+GATE_CONFIGS = {
+    "gate_1_prd": {
+        "title": "GATE 1: Phê Duyệt PRD & Phạm Vi Dự Án (Client Scope Sign-off)",
+        "role": "Product Owner / Client Liaison Lead",
+        "description": "Thẩm định phạm vi dự án (In-Scope vs Out-of-Scope), User Stories (Gherkin format) và luồng UI/UX Concept.",
+        "search_patterns": ["**/prd.md", "**/ui_ux_spec.md", "**/clarification*.md"],
+        "checklist": [
+            "Đã phỏng vấn làm rõ các yêu cầu nghiệp vụ cốt lõi (Clarification Q&A).",
+            "Phạm vi In-Scope MVP và Out-of-Scope v2.0 được phân ranh giới rõ ràng.",
+            "Toàn bộ Acceptance Criteria tuân thủ chuẩn Gherkin (Given-When-Then).",
+            "Sơ đồ điều hướng màn hình (Mermaid) và ma trận 5 UI states đã được thiết lập.",
+        ],
+    },
+    "gate_2_architecture": {
+        "title": "GATE 2: Phê Duyệt Kiến Trúc & Hợp Đồng Dữ Liệu (Technical Sign-off)",
+        "role": "System Architect / Tech Lead",
+        "description": "Thẩm định thiết kế phân tầng Clean Architecture, OpenAPI Contract, sơ đồ ERD và mô hình đe dọa STRIDE.",
+        "search_patterns": ["**/plan.md", "**/openapi.*", "**/architecture*.md"],
+        "checklist": [
+            "Kiến trúc phân tầng tuân thủ Clean Architecture (core -> models -> schemas -> repos -> services -> routers).",
+            "Đồng bộ chuẩn hóa 100% snake_case trên Database, Backend Schemas và Frontend Types.",
+            "Mô hình dữ liệu ERD và Alembic Migrations thiết kế đúng chuẩn quan hệ và indexes.",
+            "Hoàn thành mô hình đe dọa bảo mật STRIDE và phân quyền RBAC/ABAC.",
+        ],
+    },
+    "gate_3_deploy": {
+        "title": "GATE 3: Cấp Phép Triển Khai & Bàn Giao (Production Readiness Sign-off)",
+        "role": "Principal Code Reviewer / QA Lead",
+        "description": "Thẩm định kết quả kiểm thử tự động, độ phủ mã nguồn (Coverage >= 80%), tính toàn vẹn Database và audit bảo mật OWASP.",
+        "search_patterns": ["**/test-report.md", "**/review-report.md", "**/uat_checklist.md"],
+        "checklist": [
+            "100% bài kiểm thử PyTest Backend và DB vượt qua (Zero Failures).",
+            "Độ phủ kiểm thử Backend đạt tối thiểu >= 80% (pytest-cov pass).",
+            "Alembic Database đạt chuẩn Zero Schema Drift (alembic check pass).",
+            "Bảng điểm Code Review đạt >= 85/100, 0 phát hiện rò rỉ secret hoặc lỗ hổng OWASP nghiêm trọng.",
+        ],
+    },
 }
 
 EXCLUDE_DIRS = {
@@ -118,6 +158,82 @@ def get_project_name() -> str:
     return "AI-Vibe-Coding Project"
 
 
+def generate_review_gate_artifact(
+    gate_key: str,
+    status: str,
+    reviewer: str,
+    note: str,
+    project_name: str,
+) -> Optional[Path]:
+    """Sinh tài liệu Review Gate tương tác để hiển thị trực quan trên Antigravity IDE (Artifacts tab)."""
+    if gate_key not in GATE_CONFIGS:
+        return None
+
+    cfg = GATE_CONFIGS[gate_key]
+    specs_dir = ROOT_DIR / "docs" / "specs"
+    specs_dir.mkdir(parents=True, exist_ok=True)
+    out_file = specs_dir / f"review_{gate_key}.md"
+
+    # Tìm các file tương ứng trong docs/specs
+    matched_files = []
+    for pattern in cfg["search_patterns"]:
+        matched_files.extend(list(specs_dir.glob(pattern)))
+
+    table_rows = []
+    if matched_files:
+        for idx, f in enumerate(matched_files, 1):
+            try:
+                rel = f.relative_to(ROOT_DIR)
+            except ValueError:
+                rel = f
+            size_kb = f.stat().st_size / 1024
+            table_rows.append(f"| {idx} | [{f.name}]({rel}) | `{rel}` | {size_kb:.1f} KB | ✅ Sẵn sàng |")
+    else:
+        table_rows.append("| 1 | Chưa phát hiện file spec liên quan | `docs/specs/` | 0 KB | ⚠️ Cần bổ sung |")
+
+    table_md = "\n".join(table_rows)
+
+    checklist_items = []
+    for item in cfg["checklist"]:
+        check_mark = "[x]" if status.upper() == "APPROVED" else "[ ]"
+        checklist_items.append(f"- {check_mark} {item}")
+    checklist_md = "\n".join(checklist_items)
+
+    status_icon = "🟢" if status.upper() == "APPROVED" else "🟡"
+
+    content = f"""# 🚦 CHỐT CHẶN KIỂM SOÁT CHẤT LƯỢNG: {cfg['title']}
+
+> [!IMPORTANT]
+> **Dự án:** `{project_name}`  
+> **Vai trò người phê duyệt yêu cầu:** `{cfg['role']}`  
+> **Mục tiêu chốt chặn:** {cfg['description']}
+
+---
+
+## 📂 1. DANH SÁCH ARTIFACTS ĐỐI CHIẾU
+| STT | Tên Tài Liệu | Đường Dẫn Tương Đối | Kích Thước | Trạng Thái |
+| :---: | :--- | :--- | :--- | :---: |
+{table_md}
+
+---
+
+## 📋 2. KẾT QUẢ PHÊ DUYỆT (DECISION LOG)
+- **Trạng thái Gate:** {status_icon} **`{status.upper()}`**
+- **Người ký duyệt:** `{reviewer}`
+- **Thời gian ghi nhận:** `{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}`
+- **Ghi chú & Đánh giá của Tech Lead / PO:**
+> {note or "Đạt toàn bộ tiêu chuẩn chốt chặn chất lượng."}
+
+---
+
+## ☑️ 3. BẢNG KIỂM TRA PHÊ DUYỆT (QUALITY CHECKLIST)
+{checklist_md}
+"""
+    out_file.write_text(content, encoding="utf-8")
+    print(f"📄 [INTERACTIVE ARTIFACT] Đã tạo tài liệu duyệt trực quan: {out_file.name}")
+    return out_file
+
+
 def save_checkpoint(
     phase: str,
     status: str = "APPROVED",
@@ -137,6 +253,9 @@ def save_checkpoint(
 
     # Tạo snapshot code
     snapshot_archive = create_code_snapshot(safe_phase)
+
+    # Sinh interactive review gate markdown nếu thuộc các chốt chặn Gate
+    generate_review_gate_artifact(safe_phase, status, reviewer, note, project_name)
 
     # Thu thập danh sách artifacts hiện hữu
     artifacts = []
@@ -201,28 +320,59 @@ def list_checkpoints() -> List[Dict]:
     return checkpoints
 
 
+def count_loc(directory: Path, extensions: tuple) -> tuple[int, int]:
+    """Đếm số file và số dòng code trong thư mục."""
+    total_files = 0
+    total_lines = 0
+    if not directory.exists():
+        return 0, 0
+    for p in directory.rglob("*"):
+        if p.is_file() and p.suffix in extensions and "node_modules" not in str(p) and ".next" not in str(p):
+            try:
+                lines = len(p.read_text(encoding="utf-8", errors="ignore").splitlines())
+                total_files += 1
+                total_lines += lines
+            except Exception:
+                pass
+    return total_files, total_lines
+
+
 def print_status() -> None:
     if not LATEST_FILE.exists():
         print("ℹ️ Chưa có trạng thái checkpoint nào được ghi nhận.")
         print("👉 Gợi ý: Hãy lưu checkpoint đầu tiên bằng: make checkpoint PHASE=discovery")
-        return
+    else:
+        try:
+            latest = json.loads(LATEST_FILE.read_text(encoding="utf-8"))
+            print("=" * 72)
+            print("📍 TRẠNG THÁI TIẾN TRÌNH SDLC HIỆN TẠI (AI-Vibe-Coding)")
+            print("=" * 72)
+            print(f"• Dự án:          {latest.get('project_name')}")
+            print(f"• Checkpoint ID:  {latest.get('checkpoint_id')}")
+            print(f"• Giai đoạn:      {latest.get('phase_label')}")
+            print(f"• Trạng thái:     {latest.get('status')} (Bởi: {latest.get('reviewer')})")
+            print(f"• Thời gian:      {latest.get('timestamp')[:19].replace('T', ' ')}")
+            print(f"• Ghi chú:        {latest.get('note')}")
+            print(f"• File Snapshot:  {latest.get('snapshot_file')}")
+            print("=" * 72)
+        except Exception as e:
+            print(f"❌ Không thể đọc trạng thái mới nhất: {e}")
 
-    try:
-        latest = json.loads(LATEST_FILE.read_text(encoding="utf-8"))
-    except Exception as e:
-        print(f"❌ Không thể đọc trạng thái mới nhất: {e}")
-        return
+    # Thống kê nhanh sức khỏe mã nguồn (Codebase Health Dashboard)
+    be_files, be_lines = count_loc(ROOT_DIR / "src" / "backend", (".py",))
+    db_files, db_lines = count_loc(ROOT_DIR / "src" / "db", (".py",))
+    fe_files, fe_lines = count_loc(ROOT_DIR / "src" / "frontend" / "src", (".ts", ".tsx", ".js", ".jsx"))
+    mb_files, mb_lines = count_loc(ROOT_DIR / "src" / "mobile" / "src", (".ts", ".tsx", ".js", ".jsx"))
+    mb_app_f, mb_app_l = count_loc(ROOT_DIR / "src" / "mobile" / "app", (".ts", ".tsx", ".js", ".jsx"))
 
-    print("=" * 72)
-    print("📍 TRẠNG THÁI TIẾN TRÌNH SDLC HIỆN TẠI (AI-Vibe-Coding)")
-    print("=" * 72)
-    print(f"• Dự án:          {latest.get('project_name')}")
-    print(f"• Checkpoint ID:  {latest.get('checkpoint_id')}")
-    print(f"• Giai đoạn:      {latest.get('phase_label')}")
-    print(f"• Trạng thái:     {latest.get('status')} (Bởi: {latest.get('reviewer')})")
-    print(f"• Thời gian:      {latest.get('timestamp')[:19].replace('T', ' ')}")
-    print(f"• Ghi chú:        {latest.get('note')}")
-    print(f"• File Snapshot:  {latest.get('snapshot_file')}")
+    specs_files = [p.name for p in (ROOT_DIR / "docs" / "specs").rglob("*.md") if p.is_file()]
+
+    print("\n📊 TỔNG QUAN SỨC KHỎE MÃ NGUỒN (PROJECT HEALTH DASHBOARD):")
+    print(f"  • Backend API (FastAPI):       {be_files} files, {be_lines:,} lines of code")
+    print(f"  • Database & Models:           {db_files} files, {db_lines:,} lines of code")
+    print(f"  • Web Client (Next.js/React):  {fe_files} files, {fe_lines:,} lines of code")
+    print(f"  • Mobile App (Expo/React Native): {mb_files + mb_app_f} files, {mb_lines + mb_app_l:,} lines of code")
+    print(f"  • Specs & Artifacts:           {len(specs_files)} markdown specs tài liệu")
     print("=" * 72)
 
 
@@ -277,6 +427,14 @@ def restore_checkpoint(checkpoint_id: str) -> bool:
 
         print(f"🔄 Đang khôi phục mã nguồn và trạng thái về Checkpoint '{data['checkpoint_id']}'...")
         print(f"📦 Giai đoạn: {data.get('phase_label')}")
+
+        # [Safety Precaution] Tự động sao lưu dự phòng hiện trạng trước khi khôi phục
+        try:
+            print("🛡️ [Safety Precaution] Đang tự động lưu snapshot dự phòng 'pre_restore_backup'...")
+            pre_backup = create_code_snapshot("pre_restore_backup")
+            print(f"   Đã lưu bản phòng ngừa tại: {pre_backup.name}")
+        except Exception as e:
+            print(f"⚠️ Cảnh báo: Không thể tạo pre-restore backup: {e}")
 
         with tarfile.open(snapshot_path, "r:gz") as tar:
             tar.extractall(path=ROOT_DIR)

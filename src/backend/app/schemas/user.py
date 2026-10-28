@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
@@ -24,9 +24,9 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     """Schema cập nhật thông tin User"""
-    email: Optional[EmailStr] = None
-    full_name: Optional[str] = None
-    is_active: Optional[bool] = None
+    email: EmailStr | None = None
+    full_name: str | None = None
+    is_active: bool | None = None
 
 class UserResponse(UserBase):
     """Schema dữ liệu trả về cho Client - Khớp chính xác với TypeScript Interface"""

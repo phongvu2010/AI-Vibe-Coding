@@ -1,0 +1,105 @@
+version: "2.0"
+pipeline_name: "ai_vibe_coding_automated_flow"
+description: "Pipeline tự động hóa phát triển Full-Stack theo template AI-Vibe-Coding"
+
+# Thiết lập ngữ cảnh chung áp dụng cho mọi Agent
+global_rules:
+  - ".agents/rules/coding_standards.md"
+  - ".agents/rules/security_guardrails.md"
+  - ".agents/rules/review_criteria.md"
+
+stages:
+  # Giai đoạn 1: Làm rõ yêu cầu & Giao diện
+  - stage_id: "discovery"
+    name: "Requirements & Specification"
+    agents:
+      - id: "lead_ba"
+        role_file: ".agents/agents/lead-ba.md"
+        skill_dir: ".agents/skills/requirement_elicitation"
+        input: "context.user_brief"
+        output_file: "docs/specs/${feature_name}/prd.md"
+      - id: "uiux_designer"
+        role_file: ".agents/agents/uiux-designer.md"
+        depends_on: ["lead_ba"]
+        input: "docs/specs/${feature_name}/prd.md"
+        output_file: "docs/specs/${feature_name}/ui_ux_spec.md"
+    gate:
+      type: "file_exists"
+      required_files:
+        - "docs/specs/${feature_name}/prd.md"
+        - "docs/specs/${feature_name}/ui_ux_spec.md"
+
+  # Giai đoạn 2: Thiết kế kỹ thuật & Khóa Contract
+  - stage_id: "architecture"
+    name: "Architecture & API Contract Design"
+    agents:
+      - id: "system_architect"
+        role_file: ".agents/agents/system-architect.md"
+        input: 
+          - "docs/specs/${feature_name}/prd.md"
+          - "docs/specs/${feature_name}/ui_ux_spec.md"
+        output_files:
+          - "docs/specs/${feature_name}/plan.md"
+          - "docs/specs/openapi.json"
+      - id: "db_dev"
+        role_file: ".agents/agents/db-dev.md"
+        skill_dir: ".agents/skills/db_sqlalchemy_alembic"
+        depends_on: ["system_architect"]
+        input: "docs/specs/${feature_name}/plan.md"
+        action: "generate_migrations"
+    gate:
+      type: "shell_command"
+      commands:
+        - "python scripts/verify_contracts.py"
+        - "python scripts/verify_migrations.py"
+      on_failure: "retry_agent:system_architect"
+
+  # Giai đoạn 3: Viết mã nguồn (Dev Squad)
+  - stage_id: "implementation"
+    name: "Full-Stack Development"
+    agents:
+      - id: "backend_dev"
+        role_file: ".agents/agents/backend-dev.md"
+        skill_dir: ".agents/skills/backend_fastapi_clean"
+        input:
+          - "docs/specs/openapi.json"
+          - "docs/specs/${feature_name}/plan.md"
+        targets:
+          - "src/backend/app/"
+          - "src/db/models/"
+      - id: "frontend_dev"
+        role_file: ".agents/agents/frontend-dev.md"
+        skill_dir: ".agents/skills/frontend_nextjs_tailwind"
+        input:
+          - "docs/specs/openapi.json"
+          - "docs/specs/${feature_name}/ui_ux_spec.md"
+        targets:
+          - "src/frontend/src/"
+    gate:
+      type: "shell_command"
+      commands:
+        - "pytest src/backend/tests"
+        - "python scripts/verify_contracts.py"
+      on_failure: "rollback_and_notify"
+
+  # Giai đoạn 4: Kiểm định & Đóng gói
+  - stage_id: "verification_and_release"
+    name: "QA Review & Release"
+    agents:
+      - id: "code_reviewer"
+        role_file: ".agents/agents/code-reviewer.md"
+        action: "audit_code_changes"
+      - id: "qa_tester"
+        role_file: ".agents/agents/qa-tester.md"
+        skill_dir: ".agents/skills/test_runner_suite"
+        action: "run_full_integration_tests"
+      - id: "release_engineer"
+        role_file: ".agents/agents/release-engineer.md"
+        skill_dir: ".agents/skills/release_packager"
+        depends_on: ["qa_tester", "code_reviewer"]
+        action: "package_bundle"
+    gate:
+      type: "shell_command"
+      commands:
+        - "python scripts/smoke_test.py"
+        - "python scripts/bundle_release.py"

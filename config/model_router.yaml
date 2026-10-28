@@ -1,80 +1,312 @@
-# Model Routing & Token Cost Optimization Matrix
+# ==============================================================================
+# CẤU HÌNH PHÂN BỔ MÔ HÌNH AI & TỐI ƯU CHI PHÍ TOKEN (MODEL ALLOCATION MATRIX)
+# Hệ thống AI-Vibe-Coding (Google Antigravity 2.0 & Gemini API)
 # Tối ưu hóa 65% - 80% chi phí token bằng cách phân bổ mô hình chính xác theo khối lượng nhận thức.
+# ==============================================================================
 
 tiers:
   pro:
+    default_model: "gemini-2.5-pro"
     model_name: "gemini-2.5-pro"
+    nextgen_model: "gemini-3.8-pro"
+    env_override_key: "GEMINI_PRO_MODEL"
+    relative_cost_factor: 5.0
+    description: "Khả năng suy luận bậc cao, thiết kế kiến trúc phân tầng, phân tích bảo mật STRIDE/OWASP và refactor phức tạp. Sẵn sàng cho Gemini 3.8 Pro."
     target_tasks:
       - "Phân tích yêu cầu nghiệp vụ chuyên sâu và kịch bản góc"
-      - "Thiết kế kiến trúc hệ thống và mô hình dữ liệu quan hệ"
-      - "Đánh giá mô hình đe dọa STRIDE và bảo mật OWASP"
-      - "Thẩm định chất lượng mã nguồn và phát hiện lỗi tiềm ẩn"
-  flash:
-    model_name: "gemini-2.5-flash"
-    target_tasks:
-      - "Tiếp nhận và phân loại yêu cầu sơ bộ"
-      - "Thiết kế luồng màn hình UI/UX và tokens"
-      - "Thực thi kiểm thử tự động 5 tầng và phân tích lỗi"
-      - "Cấu hình Docker và DevOps scripts"
-  flash_lite:
-    model_name: "gemini-2.5-flash-lite"
-    target_tasks:
-      - "Đóng gói mã nguồn và tạo checksum manifest"
-      - "Soạn thảo hướng dẫn sử dụng và tài liệu triển khai"
-      - "Tạo ghi chú phát hành (Changelog)"
+      - "Thiết kế kiến trúc hệ thống Clean Architecture 5 tầng và mô hình ERD"
+      - "Đánh giá mô hình đe dọa STRIDE và bảo mật OWASP Top 10"
+      - "Thẩm định chất lượng mã nguồn (Code Review) và phát hiện lỗi tiềm ẩn"
+      - "Deep Domain Code Synthesis & Complex Algorithms"
 
+  flash:
+    default_model: "gemini-2.5-flash"
+    model_name: "gemini-2.5-flash"
+    nextgen_model: "gemini-3.8-flash"
+    env_override_key: "GEMINI_FLASH_MODEL"
+    relative_cost_factor: 1.0
+    description: "Cân bằng hoàn hảo giữa tốc độ, độ chuẩn xác cấu trúc, phân tích nghiệp vụ và chi phí vận hành. Sẵn sàng cho Gemini 3.8 Flash."
+    target_tasks:
+      - "Bóc tách PRD, SMART Goals, User Stories (Gherkin)"
+      - "Thiết kế luồng màn hình UI/UX và components frontend Web/Mobile"
+      - "Điều phối DAG Tasks và quản lý dependencies"
+      - "Thực thi kiểm thử tự động 5 tầng và QA Automation Runner"
+      - "Áp bản vá lỗi tự động (Auto-Healing Patch Application)"
+
+  flash_lite:
+    default_model: "gemini-2.5-flash-lite"
+    model_name: "gemini-2.5-flash-lite"
+    nextgen_model: "gemini-3.8-flash-lite"
+    env_override_key: "GEMINI_FLASH_LITE_MODEL"
+    relative_cost_factor: 0.25
+    description: "Tốc độ siêu nhanh, tiêu thụ token tối thiểu, chuyên trách tổng hợp văn bản, viết tài liệu và quét cú pháp. Sẵn sàng cho Gemini 3.8 Flash-Lite."
+    target_tasks:
+      - "Làm rõ yêu cầu sơ bộ (Clarification Q&A)"
+      - "Viết tài liệu người dùng (USER_MANUAL.md, API_GUIDE.md, README.md)"
+      - "Lập bảng kiểm nghiệm thu (UAT_CHECKLIST.md)"
+      - "Đóng gói Release Manifest và tính mã băm Checksum"
+      - "Quét tĩnh regex (Secret Scanner, Linter formatting)"
+
+# Phân bổ chi tiết theo 5 Sub-Teams & từng Subagent chuyên trách
+subteams:
+  discovery_team:
+    default_tier: "flash"
+    env_override_key: "DISCOVERY_MODEL"
+    rationale: "Bóc tách yêu cầu thô thành PRD và User Stories Gherkin cần tốc độ cao và cấu trúc chuẩn mà không cần mô hình reasoning đắt đỏ."
+    subagents:
+      client_liaison:
+        tier: "flash_lite"
+        role: "Tiếp nhận câu hỏi và phân loại sơ bộ"
+      ba_po:
+        tier: "flash"
+        role: "Sinh PRD chuẩn SMART và Gherkin User Stories"
+      lead_ba:
+        tier: "pro"
+        role: "Phân tích logic nghiệp vụ sâu và giải quyết xung đột yêu cầu"
+      ui_ux_concept:
+        tier: "flash"
+        role: "Phác thảo luồng màn hình người dùng Web/Mobile"
+      uiux_designer:
+        tier: "flash"
+        role: "Thiết kế sơ đồ Mermaid và ma trận trạng thái UI"
+
+  architecture_team:
+    default_tier: "pro"
+    env_override_key: "ARCHITECTURE_MODEL"
+    rationale: "Thiết kế Clean Architecture, chuẩn hóa quan hệ ERD, OpenAPI specs và bảo mật STRIDE đòi hỏi tư duy kiến trúc bậc cao để tránh lỗi nền tảng."
+    subagents:
+      system_architect:
+        tier: "pro"
+        role: "Quyết định Tech Stack và phân tầng Clean Architecture"
+      security_architect:
+        tier: "pro"
+        role: "Mô hình đe dọa STRIDE và ma trận phân quyền RBAC"
+      technical_pm:
+        tier: "flash"
+        role: "Phân rã đồ thị công việc DAG Backlog"
+      tech_planner:
+        tier: "pro"
+        role: "Đảm bảo tính chính xác tuyệt đối của Cross-Layer Contract Matrix"
+
+  engineering_team:
+    default_tier: "pro"
+    synthesis_tier: "pro"
+    env_override_key: "ENGINEERING_MODEL"
+    rationale: "Sử dụng Pro cho Backend Clean Architecture 5 tầng, SQLAlchemy 2.0 ORM & Deep Logic Synthesis; Flash cho UI Screens; Flash-Lite cho Dockerfile (Hybrid Tiering)."
+    subagents:
+      backend_engineer:
+        tier: "pro"
+        role: "Lập trình Clean Architecture 5 tầng, SQLAlchemy 2.0 & Alembic"
+      frontend_engineer:
+        tier: "flash"
+        role: "Lập trình UI Screens, Store và Jest test suite"
+      devops_engineer:
+        tier: "flash_lite"
+        role: "Multi-stage Dockerfile và docker-compose"
+      db_dev:
+        tier: "inherit"
+        role: "SQLAlchemy 2.0 Async Models và Alembic Migrations"
+      frontend_dev:
+        tier: "inherit"
+        role: "Next.js 15 App Router & React Native Expo Mobile"
+      backend_dev:
+        tier: "inherit"
+        role: "FastAPI REST endpoints kết nối Database"
+
+  qa_team:
+    default_tier: "flash"
+    audit_tier: "pro"
+    env_override_key: "QA_MODEL"
+    rationale: "Chạy test runner và auto-healing patch dùng Flash; thẩm định bảo mật OWASP và chấm điểm Code Review scorecard dùng Pro."
+    subagents:
+      qa_automation:
+        tier: "flash"
+        role: "Điều phối PyTest, Code Coverage và Jest Runner"
+      qa_tester:
+        tier: "flash"
+        role: "Thực thi 5 tầng kiểm thử tự động và phân tích traceback"
+      database_auditor:
+        tier: "flash"
+        role: "Thẩm định tính toàn vẹn Alembic và Schema Drift"
+      code_reviewer:
+        tier: "pro"
+        role: "Đánh giá Clean Code Scorecard và Tech Lead Readability"
+      security_auditor:
+        tier: "pro"
+        role: "Kiểm toán 10 tiêu chuẩn OWASP API Security"
+      auto_healing_coordinator:
+        tier: "flash"
+        role: "Phân tích traceback và áp bản vá mã nguồn"
+
+  release_team:
+    default_tier: "flash_lite"
+    env_override_key: "RELEASE_MODEL"
+    rationale: "Tổng hợp UAT Checklist, User Manual và Manifest là các tác vụ định dạng tài liệu, dùng Flash-Lite giúp tiết kiệm tối đa chi phí."
+    subagents:
+      release_engineer:
+        tier: "flash_lite"
+        role: "Đóng gói ZIP và tính SHA-256 Checksum"
+      tech_writer:
+        tier: "flash_lite"
+        role: "Biên soạn USER_MANUAL.md và hướng dẫn triển khai"
+      client_handover_lead:
+        tier: "flash_lite"
+        role: "Lập bảng kiểm nghiệm thu UAT dễ hiểu cho khách hàng"
+      handover_lead:
+        tier: "flash"
+        role: "Tổng hợp kết quả nghiệm thu UAT và hướng dẫn người dùng"
+
+  fast_track_team:
+    default_tier: "flash"
+    env_override_key: "FAST_TRACK_MODEL"
+    rationale: "Sub-Team Fast-Track (Tactical Agile Squad) xử lý các micro-tasks, bugfix và tính năng nhanh hàng ngày, ưu tiên tốc độ cao và chi phí tối ưu."
+    subagents:
+      producer_remy:
+        tier: "flash"
+        role: "Bóc tách phạm vi task, file diffs và kế hoạch triển khai"
+      dev_sage:
+        tier: "pro"
+        role: "Clean Architecture 5 tầng, SQLAlchemy 2.0 ORM & Alembic migrations"
+      dev_nova:
+        tier: "flash"
+        role: "Frontend UI/UX, API Client integration và Reactive Store"
+      dev_milo:
+        tier: "flash"
+        role: "TypeScript contracts, PyTest & Jest test coverage"
+      qa_ivy:
+        tier: "flash"
+        role: "Kiểm thử độc lập PyTest, Alembic Drift và Auto-Healing"
+
+# Ánh xạ tương thích cho 15 Subagents chuyên trách & Aliases
 agents_allocation:
   # Sub-Team 1: Discovery & Solutions
   account-lead:
     tier: "flash"
+    env_override_key: "ACCOUNT_LEAD_MODEL"
     rationale: "Tốc độ phản hồi nhanh, phân loại yêu cầu sơ bộ"
   lead-ba:
     tier: "pro"
+    env_override_key: "BA_MODEL"
     rationale: "Phân tích logic nghiệp vụ sâu, xử lý mâu thuẫn yêu cầu và Gherkin user stories"
   uiux-designer:
     tier: "flash"
+    env_override_key: "UIUX_MODEL"
     rationale: "Thiết kế sơ đồ Mermaid và ma trận trạng thái UI"
 
   # Sub-Team 2: Architecture & Planning
   system-architect:
     tier: "pro"
+    env_override_key: "ARCHITECT_MODEL"
     rationale: "Thiết kế phân tầng Clean Architecture và mô hình ERD"
   security-architect:
     tier: "pro"
+    env_override_key: "SECURITY_ARCHITECT_MODEL"
     rationale: "Phân tích nguy cơ bảo mật STRIDE và ma trận phân quyền"
   tech-planner:
     tier: "pro"
+    env_override_key: "PLANNER_MODEL"
     rationale: "Đảm bảo tính chính xác tuyệt đối của Cross-Layer Contract Matrix"
 
   # Sub-Team 3: Core Engineering
   db-dev:
     tier: "inherit"
+    env_override_key: "DB_DEV_MODEL"
     rationale: "Thừa hưởng mô hình của Tech Lead để duy trì độ tương thích"
   frontend-dev:
     tier: "inherit"
+    env_override_key: "FRONTEND_DEV_MODEL"
     rationale: "Thừa hưởng mô hình của Tech Lead"
   backend-dev:
     tier: "inherit"
+    env_override_key: "BACKEND_DEV_MODEL"
     rationale: "Thừa hưởng mô hình của Tech Lead"
   devops-engineer:
     tier: "flash"
+    env_override_key: "DEVOPS_MODEL"
     rationale: "Tập trung sinh cấu hình Docker và scripts tự động hóa"
 
   # Sub-Team 4: QA & Security Audit
   qa-tester:
     tier: "flash"
+    env_override_key: "QA_MODEL"
     rationale: "Tiết kiệm 60% latency và chi phí trong các vòng lặp kiểm thử tự động"
   code-reviewer:
     tier: "pro"
+    env_override_key: "CODE_REVIEW_MODEL"
     rationale: "Audit diff chuyên sâu, phát hiện N+1 query và lỗ hổng OWASP"
 
   # Sub-Team 5: Release & Handover
   release-engineer:
     tier: "flash_lite"
+    env_override_key: "RELEASE_MODEL"
     rationale: "Tác vụ đóng gói manifest và tính checksum tiết kiệm tối đa token"
   tech-writer:
     tier: "flash_lite"
+    env_override_key: "TECH_WRITER_MODEL"
     rationale: "Soạn thảo tài liệu markdown theo mẫu có sẵn"
   handover-lead:
     tier: "flash"
+    env_override_key: "HANDOVER_MODEL"
     rationale: "Tổng hợp kết quả nghiệm thu UAT và hướng dẫn người dùng"
+
+  # Tactical Agile: Fast-Track Squad
+  fast-track-squad:
+    tier: "flash"
+    env_override_key: "FAST_TRACK_MODEL"
+    rationale: "Tốc độ phản hồi cực nhanh cho micro-tasks & bugfix; tự động nâng lên pro khi sửa database schema phức tạp"
+  ai_team_dev:
+    tier: "flash"
+    env_override_key: "FAST_TRACK_MODEL"
+    rationale: "Bí danh tương thích ngược cho Tactical Agile Dev Team"
+
+# Khối ánh xạ trực tiếp chuẩn AI-Team-Dev (Backward & Cross-Template Compatibility)
+agents:
+  ba:
+    name: "Business Analyst & Requirements Engineer"
+    default_tier: "flash"
+    recommended_model: "gemini-2.5-flash"
+    env_override_key: "BA_MODEL"
+    rationale: "Bóc tách PRD, phỏng vấn tương tác và sinh Gherkin BDD kịch bản mẫu cần tốc độ nhanh và cấu trúc JSON chuẩn."
+
+  planner:
+    name: "System Architect & Technical Planner"
+    default_tier: "pro"
+    recommended_model: "gemini-2.5-pro"
+    env_override_key: "PLANNER_MODEL"
+    rationale: "Thiết kế kiến trúc hệ thống, ma trận dữ liệu 3 tầng (DB <-> API <-> UI) và phòng chống drift đòi hỏi tư duy kiến trúc bậc cao."
+
+  db-dev:
+    name: "Database Engineer (PostgreSQL / SQLAlchemy)"
+    default_tier: "flash"
+    recommended_model: "gemini-2.5-flash"
+    env_override_key: "DB_DEV_MODEL"
+    rationale: "Xây dựng schema SQLAlchemy 2.0 và Alembic migrations tuân thủ chặt chẽ theo plan.md, mô hình Flash cho kết quả nhanh và chính xác."
+
+  frontend-dev:
+    name: "Frontend & Mobile Engineer (Next.js / Vite / Expo)"
+    default_tier: "flash"
+    recommended_model: "gemini-2.5-flash"
+    env_override_key: "FRONTEND_DEV_MODEL"
+    rationale: "Xây dựng UI screens, Tailwind CSS layouts, 5 UI states và API client typed theo OpenAPI contract."
+
+  backend-dev:
+    name: "Backend Engineer (FastAPI / Pydantic v2)"
+    default_tier: "pro"
+    recommended_model: "gemini-2.5-pro"
+    env_override_key: "BACKEND_DEV_MODEL"
+    rationale: "Triển khai async business logic, dependency injection, exception handling và kết nối DB an toàn."
+
+  qa-tester:
+    name: "QA & Testing Specialist"
+    default_tier: "flash"
+    recommended_model: "gemini-2.5-flash"
+    env_override_key: "QA_MODEL"
+    rationale: "Chạy Pytest, Jest/E2E runner, kiểm tra độ phủ >=80%, và bóc tách traceback thành micro-patch tickets."
+
+  code-reviewer:
+    name: "Principal Code Reviewer & Security Auditor"
+    default_tier: "pro"
+    recommended_model: "gemini-2.5-pro"
+    env_override_key: "CODE_REVIEW_MODEL"
+    rationale: "Đánh giá chất lượng mã nguồn qua git diff, thẩm định OWASP Top 10 và STRIDE Threat Model."
+

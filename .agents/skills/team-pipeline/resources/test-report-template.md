@@ -1,0 +1,120 @@
+---
+feature_slug: "<feature-slug>"
+version: "1.0.0"
+artifact_type: "test-report"
+tester: "qa-tester"
+created_at: "YYYY-MM-DDTHH:MM:SSZ"
+updated_at: "YYYY-MM-DDTHH:MM:SSZ"
+overall_status: "PASSED" # PASSED | FAILED
+iteration: 1 # Vòng lặp kiểm thử (1 -> 3)
+metrics:
+  total_tests: 0
+  passed: 0
+  failed: 0
+  skipped: 0
+  duration_seconds: 0.0
+---
+
+# QA & Automated Test Report: `<Feature Name>`
+
+> **Báo cáo Kiểm thử Tự động**: Tài liệu đánh giá chất lượng toàn diện độc lập cho tính năng `<Feature Name>`, bao gồm linter, unit/integration test backend/DB và typecheck frontend.
+
+---
+
+## 1. Tóm Tắt & Chỉ Số Kiểm Thử (Executive Summary & Metrics)
+
+- **Trạng thái Tổng thể**: `PASSED` | `FAILED`
+- **Vòng lặp Kiểm thử (Iteration)**: `<iteration_number> / 3`
+- **Tỷ lệ Vượt qua (Pass Rate)**: `100%`
+
+| Hạng mục Kiểm định | Công cụ (Runner) | Phạm vi | Kết quả | Passed | Failed | Thời gian |
+| :--- | :--- | :--- | :---: | :---: | :---: | :--- |
+| **Linter & Code Style** | `.venv/bin/ruff check src/` | Toàn bộ `src/` | PASSED | - | 0 | 0.05s |
+| **Database Layer** | `PYTHONPATH=src .venv/bin/pytest` | `src/backend/tests/` | PASSED | 0 | 0 | 0.02s |
+| **Backend API Endpoints** | `PYTHONPATH=src .venv/bin/pytest` | `src/backend/tests/` | PASSED | 0 | 0 | 0.03s |
+| **Frontend TypeScript Safety**| `npm --prefix src/frontend run typecheck` | `src/frontend/` | PASSED | - | 0 | 1.20s |
+
+---
+
+## 2. Ma Trận Đối Chiếu Kịch Bản Kiểm Thử (Acceptance Criteria vs Results)
+
+### 2.1. Ma Trận Kiểm Thử Tự Động (Automated Acceptance Tests)
+| Mã AC (`plan.md`) | Mã Test Case | Tên Hàm / Kịch Bản Kiểm Thử | Tầng Phụ Trách | Kết Quả | Ghi Chú |
+| :--- | :--- | :--- | :--- | :---: | :--- |
+| **AC-01** | `TC-01` | `test_create_resource_success` | Backend API | ✅ PASSED | Trả về 201 Created |
+| **AC-02** | `TC-02` | `test_create_resource_validation_error` | Backend API | ✅ PASSED | Trả về 422 Unprocessable |
+| **AC-03** | `TC-03` | `test_unique_constraint_enforcement` | Database / API | ✅ PASSED | Ràng buộc hoạt động |
+| **AC-04** | `TC-04` | `UI States (Loading, Error, Empty, Success)` | Frontend Web | ✅ PASSED | Render 4 trạng thái |
+| **AC-05** | `TC-05` | `TypeScript Strict Safety Check` | Frontend | ✅ PASSED | 0 type errors, 0 any |
+
+### 2.2. Bảng Kiểm Định Trực Quan & 4 Trạng Thái Giao Diện (Visual & UI Verification qua `/browser`)
+> ℹ️ *Áp dụng cho các tính năng có giao diện Web (`src/frontend/`) hoặc Mobile Web.*
+
+- **URL Tuyến đường Kiểm tra**: `http://localhost:3000/<route>` (hoặc Vite `http://localhost:5173/<route>`)
+- **Kết quả Kiểm định Trực quan**:
+| Trạng Thái UI / Tiêu Chí | Hành Vi Mong Đợi | Kết Quả Thực Tế | Trạng Thái |
+| :--- | :--- | :--- | :---: |
+| **1. Loading State** | Skeleton loader hoặc Spinner hiển thị mượt mà khi fetch dữ liệu, không bị nhảy layout (CLS) | Skeleton hiển thị chuẩn xác | ✅ PASSED |
+| **2. Empty State** | Hiển thị thông báo thân thiện + nút CTA điều hướng khi dữ liệu rỗng | Placeholder & CTA nút tạo mới hiển thị đúng | ✅ PASSED |
+| **3. Error State** | Alert thông báo lỗi rõ ràng + Nút "Thử lại" khi API trả về mã lỗi 4xx/5xx | Banner cảnh báo đỏ kèm nút Retry | ✅ PASSED |
+| **4. Success State** | Render dữ liệu đầy đủ, chuẩn xác, style Tailwind CSS không lỗi | Render bảng / thẻ chuẩn theo design | ✅ PASSED |
+| **5. Responsive Mobile (375px)** | Giao diện tự động co giãn, hamburger menu hoặc bottom navigation hoạt động tốt | Không tràn màn hình ngang (0 horizontal scroll) | ✅ PASSED |
+| **6. Responsive Desktop (1280px)** | Bố cục grid/flex dàn đều, tận dụng tốt không gian màn hình lớn | Bố cục cân đối, typography sắc nét | ✅ PASSED |
+
+---
+
+## 3. Lệnh Thực Thi & Nhật Ký Đầu Ra (Execution Logs)
+
+```text
+# 1. Ruff Linter Output:
+.venv/bin/ruff check src/
+All checks passed!
+
+# 2. Pytest Output:
+PYTHONPATH=src ./.venv/bin/pytest src/backend/tests -v
+...
+=== X passed in Y.YYs ===
+
+# 3. Frontend Typecheck Output:
+npm --prefix src/frontend run typecheck
+...
+```
+
+---
+
+## 4. Phiếu Báo Lỗi Chi Tiết (Structured Micro-Patch Tickets — Dành cho Self-Healing)
+
+> 💡 Nếu toàn bộ bài test đều `PASSED`, ghi: *"Không phát hiện lỗi. Hệ thống đạt 100% tiêu chí nghiệm thu kiểm thử."*
+> ⚠️ **Quy chuẩn Micro-Patch**: Trích xuất đúng 5-10 dòng code ngữ cảnh và bắt buộc Dev Squad CHỈ dùng công cụ `replace_file_content` để sửa đúng dòng phát sinh lỗi, tuyệt đối không viết lại toàn bộ file.
+
+### [BUG-01] `<Tiêu đề lỗi ngắn gọn>`
+- **Mã Lỗi**: `BUG-01`
+- **Mức độ (Severity)**: `CRITICAL` | `MAJOR` | `MINOR`
+- **Tác tử Chịu trách nhiệm (Target Agent)**: `db-dev` (`src/db/`) | `backend-dev` (`src/backend/`) | `frontend-dev` (`src/frontend/`)
+- **Vị trí Phát hiện (Target File & Line Range)**: `src/.../file.py#L42-L55`
+- **Mã Kịch bản Thất bại (Failed Test ID)**: `TC-01` (`test_function_name`)
+- **Đoạn Mã Lỗi Cô Lập (Context Snippet — 5-10 Dòng có đánh dấu `>>`)**:
+  ```python
+  >>  48:  if existing_user:
+  >>  49:      raise HTTPException(status_code=400, detail="User already exists")
+  ```
+- **Nhật ký Lỗi Rút Gọn (Diagnostics qua parse_traceback.py)**:
+  ```text
+  AssertionError: assert res.status_code == 409, received 400
+  ```
+- **Phân tích Nguyên nhân Gốc (Root Cause Analysis)**:
+  - Trả về status code 400 thay vì 409 Conflict theo chuẩn REST API khi duplicate resource.
+- **Chỉ Dẫn Micro-Patch**:
+  - Yêu cầu Dev Squad CHỈ DÙNG CÔNG CỤ `replace_file_content` sửa đúng dòng vi phạm trong line range đã định vị. TUYỆT ĐỐI KHÔNG viết lại toàn bộ file.
+- **Các bước Tái hiện (Reproduction Command)**:
+  ```bash
+  PYTHONPATH=src .venv/bin/pytest src/backend/tests/test_file.py -k "test_function_name"
+  ```
+- **Trạng thái Xử lý (Status)**: `OPEN` # OPEN | IN_PROGRESS | RESOLVED | RE-TESTED
+
+---
+
+## 5. Kết Luận Nghiệm Thu Kiểm Thử (QA Sign-off)
+
+- [ ] **Đủ điều kiện chuyển sang Giai đoạn 4 (`code-reviewer`)**: Có (khi `overall_status: PASSED` 100%).
+- [ ] **Yêu cầu kích hoạt Vòng lặp Tự sửa lỗi (Self-Healing Loop)**: Có (khi có ít nhất 1 bài test thất bại).

@@ -1,9 +1,7 @@
 import uuid
-from typing import List
 
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.backend.app.schemas.user import UserCreate
 from src.db.models.user import User
 from src.db.repositories.user_repository import UserRepository
@@ -23,7 +21,7 @@ class UserService:
             )
         return user
 
-    async def get_all_users(self, skip: int = 0, limit: int = 100) -> List[User]:
+    async def get_all_users(self, skip: int = 0, limit: int = 100) -> list[User]:
         return await self.repo.get_all(skip=skip, limit=limit)
 
     async def create_user(self, payload: UserCreate) -> User:

@@ -41,3 +41,45 @@ guardrails:
   min_code_review_score: 85
   enforce_contract_sync: true
   zero_hardcoded_secrets: true
+
+sdlc_tracks:
+  track_1_enterprise:
+    name: "Enterprise Full-Lifecycle SDLC"
+    scope: "Epics, Major Features, Day-0 MVP Creation"
+    process: "5 Sub-Teams, 7 Phases, 3 Quality Gates (Client, Architecture, Production)"
+    orchestrator: "Tech Lead Main Agent + Squads"
+  track_2_fast_track:
+    name: "Tactical Fast-Track SDLC"
+    scope: "Bugfixes, Hotfixes, Micro-tasks, Local UI/API Adjustments"
+    process: "Bypasses Gate 1 & 2 -> Impact Scoping -> Targeted Dev -> Contract/Pytest Check -> Auto-Commit"
+    orchestrator: "fast-track-squad"
+
+team_modes:
+  enterprise_15_agents:
+    description: "Công ty hoàn chỉnh gồm 5 Sub-Teams chuyên sâu (15 subagents) quản lý toàn diện quy trình từ khách hàng đến phát hành."
+    subagents:
+      - account-lead
+      - lead-ba
+      - uiux-designer
+      - system-architect
+      - security-architect
+      - tech-planner
+      - db-dev
+      - frontend-dev
+      - backend-dev
+      - devops-engineer
+      - qa-tester
+      - code-reviewer
+      - release-engineer
+      - tech-writer
+      - handover-lead
+  lean_7_agents:
+    description: "Đội ngũ ma trận tinh gọn kế thừa từ AI-Team-Dev (7 subagents) tối ưu cho MVP, nhà phát triển độc lập & tiết kiệm token."
+    subagents:
+      - ba
+      - planner
+      - db-dev
+      - backend-dev
+      - frontend-dev
+      - qa-tester
+      - code-reviewer

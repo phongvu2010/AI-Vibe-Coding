@@ -20,7 +20,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+# Environment & Secrets
 .env
+.env.local
+.env.*.local
 .venv
 venv/
 ENV/
@@ -44,5 +47,38 @@ out/
 .DS_Store
 Thumbs.db
 
-# Antigravity temporary
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tsbuildinfo
+docs/specs/*/*.tmp
+
+# Database & Temporary DB files
 *.tmp
+*.db
+!data.db
+*.sqlite
+*.sqlite3
+
+# Runtime Backups & Generated Releases
+workspaces/backups/
+workspaces/artifacts/05_handover/*.zip
+workspaces/artifacts/05_handover/*.sha256
+workspaces/artifacts/04_quality/htmlcov/
+workspaces/output_project/**/data.db
+workspaces/output_project/**/.coverage
+workspaces/output_project/**/.pytest_cache/
+workspaces/output_project/**/node_modules/
+workspaces/output_project/**/dist/
+workspaces/output_project/**/.expo/
+
+# Runtime SDLC Checkpoints (Preserve .gitkeep)
+workspaces/checkpoints/*_checkpoint.json
+!workspaces/checkpoints/.gitkeep
+
+# Preserve Gitkeep markers for empty workspace scaffold
+!workspaces/output_project/.gitkeep
+!workspaces/artifacts/*/.gitkeep
+!workspaces/backups/.gitkeep

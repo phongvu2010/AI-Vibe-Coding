@@ -19,7 +19,10 @@ FROM nginx:alpine AS runner
 WORKDIR /usr/share/nginx/html
 
 # Clean default NGINX files
-RUN rm -rf ./*
+RUN rm -rf ./* /etc/nginx/conf.d/default.conf
+
+# Copy custom NGINX configuration (SPA routing + /api/ reverse proxy + security headers)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built dist files
 COPY --from=builder /app/dist ./

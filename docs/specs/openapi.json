@@ -1,13 +1,35 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "AI-Vibe-Coding Backend API",
+    "title": "AI-Vibe-Coding",
+    "description": "Backend API built on Antigravity 2.0 AI-Vibe-Coding Architecture",
     "version": "1.0.0"
   },
   "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health Check",
+        "description": "Kiểm tra tình trạng hoạt động của hệ thống API",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/health": {
       "get": {
         "tags": [
+          "Health",
           "Health"
         ],
         "summary": "Health Check",
@@ -28,6 +50,7 @@
     "/api/v1/users": {
       "get": {
         "tags": [
+          "Users",
           "Users"
         ],
         "summary": "List Users",
@@ -84,6 +107,7 @@
       },
       "post": {
         "tags": [
+          "Users",
           "Users"
         ],
         "summary": "Create User",
@@ -126,6 +150,7 @@
     "/api/v1/users/{user_id}": {
       "get": {
         "tags": [
+          "Users",
           "Users"
         ],
         "summary": "Get User",

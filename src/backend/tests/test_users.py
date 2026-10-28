@@ -40,3 +40,18 @@ async def test_duplicate_email_error(client: AsyncClient):
     res2 = await client.post("/api/v1/users", json=payload)
     assert res2.status_code == 400
     assert "detail" in res2.json()
+
+
+@pytest.mark.asyncio
+async def test_list_users(client: AsyncClient):
+    res = await client.get("/api/v1/users")
+    assert res.status_code == 200
+    assert isinstance(res.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_get_nonexistent_user(client: AsyncClient):
+    import uuid
+    random_id = uuid.uuid4()
+    res = await client.get(f"/api/v1/users/{random_id}")
+    assert res.status_code == 404

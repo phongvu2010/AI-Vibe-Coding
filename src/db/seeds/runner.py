@@ -1,27 +1,117 @@
+"""Async Seed Data Runner for Local Development & Vibe Coding.
+
+Discovers and executes all seed functions in `src/db/seeds/*_seed.py`.
+Seed functions should be decorated with `@register_seed` or define an async `seed(session)` function.
+"""
+
 import asyncio
+import importlib
+import logging
+import pkgutil
+import sys
+from collections.abc import Callable, Coroutine
+from pathlib import Path
+from typing import Any
 
-from src.db.models.user import User
-from src.db.repositories.user_repository import UserRepository
-from src.db.session import AsyncSessionLocal
+from sqlalchemy.ext.asyncio import AsyncSession
+
+# Ensure UTF-8 console output on Windows
+if hasattr(sys.stdout, "reconfigure") and sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure") and sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+# Ensure 'src' is in sys.path automatically
+_src_dir = Path(__file__).resolve().parent.parent.parent
+if str(_src_dir) not in sys.path:
+    sys.path.insert(0, str(_src_dir))
+
+from db.models.user import User  # noqa: E402
+from db.repositories.user_repository import UserRepository  # noqa: E402
+from db.session import AsyncSessionLocal  # noqa: E402
+
+logger = logging.getLogger("db.seeds")
+
+SeedFunction = Callable[[AsyncSession], Coroutine[Any, Any, None]]
+_REGISTERED_SEEDS: list[tuple[str, SeedFunction]] = []
 
 
-async def seed_data():
-    """Khởi tạo dữ liệu mẫu ban đầu"""
-    print("🌱 [SEED RUNNER] Đang khởi tạo dữ liệu mẫu cho hệ thống...")
+def register_seed(name: str | None = None) -> Callable[[SeedFunction], SeedFunction]:
+    """Decorator to register a seed function with an optional friendly name."""
+
+    def decorator(fn: SeedFunction) -> SeedFunction:
+        seed_name = name or fn.__name__
+        _REGISTERED_SEEDS.append((seed_name, fn))
+        return fn
+
+    return decorator
+
+
+@register_seed("default_admin_user")
+async def seed_default_admin(session: AsyncSession) -> None:
+    """Khởi tạo tài khoản quản trị viên mặc định."""
+    repo = UserRepository(session)
+    existing = await repo.get_by_email("admin@vibe.dev")
+    if not existing:
+        admin_user = User(
+            email="admin@vibe.dev",
+            full_name="Tech Lead Administrator",
+            is_active=True,
+        )
+        await repo.create(admin_user)
+        logger.info("✅ Đã tạo tài khoản mẫu: %s (%s)", admin_user.email, admin_user.id)
+    else:
+        logger.info("ℹ️ Tài khoản mẫu %s đã tồn tại.", existing.email)
+
+
+def auto_discover_seeds() -> None:
+    """Discover all seed modules in db.seeds package."""
+    import db.seeds as seeds_pkg
+
+    package_path = getattr(seeds_pkg, "__path__", None)
+    if not package_path:
+        return
+
+    for _, module_name, is_pkg in pkgutil.iter_modules(package_path):
+        if not is_pkg and (module_name.endswith("_seed") or module_name.startswith("seed_")):
+            full_module_name = f"db.seeds.{module_name}"
+            try:
+                mod = importlib.import_module(full_module_name)
+                if hasattr(mod, "seed") and asyncio.iscoroutinefunction(mod.seed):
+                    if not any(fn == mod.seed for _, fn in _REGISTERED_SEEDS):
+                        _REGISTERED_SEEDS.append((module_name, mod.seed))
+            except Exception as e:
+                logger.error("Failed to import seed module %s: %s", full_module_name, e)
+
+
+async def run_seeds() -> None:
+    """Execute all discovered and registered seed functions sequentially."""
+    auto_discover_seeds()
+
+    if not _REGISTERED_SEEDS:
+        logger.info("No seed functions discovered in src/db/seeds/.")
+        return
+
+    logger.info("Found %d seed functions to execute.", len(_REGISTERED_SEEDS))
     async with AsyncSessionLocal() as session:
-        repo = UserRepository(session)
-        existing = await repo.get_by_email("admin@vibe.dev")
-        if not existing:
-            admin_user = User(
-                email="admin@vibe.dev",
-                full_name="Tech Lead Administrator",
-                is_active=True
-            )
-            await repo.create(admin_user)
-            await session.commit()
-            print(f"✅ Đã tạo tài khoản mẫu: {admin_user.email} ({admin_user.id})")
-        else:
-            print(f"ℹ️ Tài khoản mẫu {existing.email} đã tồn tại.")
+        for seed_name, seed_fn in _REGISTERED_SEEDS:
+            logger.info("🌱 Running seed: %s...", seed_name)
+            try:
+                await seed_fn(session)
+                await session.commit()
+                logger.info("✅ Seed '%s' completed successfully.", seed_name)
+            except Exception as e:
+                await session.rollback()
+                logger.error("❌ Seed '%s' failed: %s", seed_name, e)
+                raise
+
+
+# Backward-compatible alias
+seed_data = run_seeds
 
 if __name__ == "__main__":
-    asyncio.run(seed_data())
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    )
+    asyncio.run(run_seeds())

@@ -1,16 +1,14 @@
 import uuid
-from typing import List
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.backend.app.schemas.user import UserCreate, UserResponse
 from src.backend.app.services.user_service import UserService
 from src.db.session import get_db
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.get("", response_model=List[UserResponse])
+@router.get("", response_model=list[UserResponse])
 async def list_users(
     skip: int = 0,
     limit: int = 100,

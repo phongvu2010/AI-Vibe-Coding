@@ -30,6 +30,28 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 AGENTS_DIR = ROOT_DIR / ".agents" / "agents"
 
 
+def get_available_mcp_servers() -> List[Dict[str, Any]]:
+    """Phát hiện các MCP Servers khả dụng trong Antigravity 2.0 (~/.gemini/antigravity/mcp)."""
+    import os
+
+    mcp_dirs = [
+        Path(os.path.expanduser("~/.gemini/antigravity/mcp")),
+        ROOT_DIR / ".gemini" / "antigravity" / "mcp",
+    ]
+    available_mcps = []
+    for mcp_root in mcp_dirs:
+        if mcp_root.exists() and mcp_root.is_dir():
+            for d in mcp_root.iterdir():
+                if d.is_dir() and not d.name.startswith("."):
+                    tools = [t.stem for t in d.glob("*.json")]
+                    available_mcps.append({
+                        "name": d.name,
+                        "path": str(d),
+                        "tools": tools,
+                    })
+    return available_mcps
+
+
 def parse_agent_markdown(file_path: Path) -> Optional[Dict[str, Any]]:
     """Phân tích cú pháp Markdown có chứa YAML Frontmatter."""
     try:
@@ -127,6 +149,14 @@ def validate_agents(agents: List[Dict[str, Any]]) -> bool:
             print(f"✅ {tier_badge} {tag:<8} : {name:<20} ({ag['file_path']})")
 
     print("=" * 72)
+    mcps = get_available_mcp_servers()
+    if mcps:
+        print(f"🔌 [MCP DISCOVERY] Tìm thấy {len(mcps)} MCP Servers khả dụng trong Antigravity 2.0:")
+        for m in mcps:
+            tools_str = ", ".join(m["tools"][:5]) + (f" (+{len(m['tools'])-5} tools)" if len(m['tools']) > 5 else "")
+            print(f"   • {m['name']:<35} : [{tools_str}]")
+        print("=" * 72)
+
     if all_ok:
         print(f"🎉 [VALIDATION PASSED] Toàn bộ {len(agents)} subagent specs đạt chuẩn Antigravity 2.0!")
     else:

@@ -12,10 +12,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vibe_db"]
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - vibe_net
 
   backend:
     build:
@@ -24,13 +26,24 @@ services:
     container_name: vibe_backend
     restart: always
     environment:
+      ENVIRONMENT: production
+      DEBUG: "False"
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/vibe_db
       SECRET_KEY: dev_secret_key_vibe_coding_antigravity_2026
+      CORS_ORIGINS: '["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001", "http://localhost:5173", "http://127.0.0.1:5173"]'
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - vibe_net
 
   frontend:
     build:
@@ -39,16 +52,24 @@ services:
     container_name: vibe_frontend
     restart: always
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000/api/v1
-      PORT: "3000"
       NODE_ENV: production
+      PORT: "3000"
+      # Internal Docker network endpoint for Server-Side Rendering (SSR):
+      INTERNAL_API_URL: http://backend:8000
+      # Browser client endpoint (Host machine accessible):
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_USE_MOCKS: "false"
     ports:
       - "3000:3000"
     depends_on:
-      - backend
-    profiles:
-      - frontend
-      - fullstack
+      backend:
+        condition: service_healthy
+    networks:
+      - vibe_net
 
 volumes:
   postgres_data:
+
+networks:
+  vibe_net:
+    driver: bridge

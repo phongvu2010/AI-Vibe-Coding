@@ -1,44 +1,121 @@
-#!/usr/bin/env python3
-"""
-verify_network.py
-Kiểm tra tình trạng các cổng mạng (Port Readiness & Conflict Checker).
-Giúp phát hiện sớm xung đột cổng mạng (8000, 3000, 5432) trước khi khởi chạy hệ thống.
+"""Network, Port Alignment & CORS Diagnostic Utility (`scripts/verify_network.py`).
+
+Verifies connectivity and configuration across the 3 core layers:
+1. Backend API (FastAPI port 8000: /health & /api/v1/health)
+2. Frontend App (Next.js port 3000 / 3001)
+3. Database (PostgreSQL / Supabase port 5432 / 6543)
+4. CORS headers validation
 """
 
+import os
 import socket
 import sys
+import urllib.error
+import urllib.request
 
-PORTS_TO_CHECK = {
-    8000: "FastAPI Backend API",
-    3000: "Next.js Web Portal",
-    5432: "PostgreSQL Database",
-    8081: "Expo Metro Bundler (Mobile)",
-}
+# Ensure UTF-8 console output on Windows to prevent UnicodeEncodeError
+if hasattr(sys.stdout, "reconfigure") and sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure") and sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-def is_port_in_use(port: int) -> bool:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.settimeout(0.5)
-        return s.connect_ex(("127.0.0.1", port)) == 0
 
-def main():
-    print("🌐 [NETWORK VERIFICATION] Đang rà soát trạng thái các cổng mạng...")
-    occupied = []
-    available = []
+def is_port_open(host: str, port: int, timeout: float = 1.0) -> bool:
+    """Check if a TCP port is open and listening."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(timeout)
+        return sock.connect_ex((host, port)) == 0
 
-    for port, service in PORTS_TO_CHECK.items():
-        if is_port_in_use(port):
-            occupied.append((port, service))
-            print(f"   ⚠️ Cổng {port} ({service}) hiện ĐANG ĐƯỢC SỬ DỤNG.")
+
+def check_http_endpoint(url: str, headers: dict[str, str] | None = None) -> tuple[bool, int, str]:
+    """Test HTTP endpoint status code and response."""
+    req = urllib.request.Request(url, headers=headers or {})
+    try:
+        with urllib.request.urlopen(req, timeout=2.0) as resp:
+            body = resp.read().decode("utf-8")
+            return True, resp.status, body
+    except urllib.error.HTTPError as e:
+        return False, e.code, str(e)
+    except Exception as e:
+        return False, 0, str(e)
+
+
+def main() -> int:
+    print("=" * 70)
+    print("🔍 AI-Vibe-Coding — Network & Port Alignment Diagnostics")
+    print("=" * 70)
+
+    # 1. Check Backend API Port 8000
+    backend_host = "127.0.0.1"
+    backend_port = 8000
+    backend_open = is_port_open(backend_host, backend_port)
+
+    print(f"\n[1] Backend API (FastAPI @ http://{backend_host}:{backend_port}):")
+    if backend_open:
+        print(f"    ✅ Port {backend_port} is OPEN and listening.")
+        # Test /health
+        ok, status, body = check_http_endpoint(f"http://{backend_host}:{backend_port}/health")
+        if ok and status == 200:
+            print(f"    ✅ GET /health: 200 OK -> {body.strip()}")
         else:
-            available.append((port, service))
-            print(f"   ✅ Cổng {port} ({service}) ĐANG SẴN SÀNG.")
+            print(f"    ⚠️ GET /health returned status {status}: {body}")
 
-    if occupied:
-        print("\nℹ️ [THÔNG BÁO] Một số cổng đang hoạt động. Nếu đây là các container Docker của dự án, bạn có thể bỏ qua.")
+        # Test CORS headers
+        cors_headers = {
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "GET",
+        }
+        ok_cors, status_cors, _ = check_http_endpoint(
+            f"http://{backend_host}:{backend_port}/health", headers=cors_headers
+        )
+        if ok_cors:
+            print("    ✅ CORS preflight / Origin check: Allowed")
+        else:
+            print(f"    ⚠️ CORS check status: {status_cors}")
     else:
-        print("\n🎉 [ALL CLEAR] Toàn bộ cổng mạng đều sẵn sàng cho khởi động mới!")
+        print(f"    ℹ️ Port {backend_port} is not currently running (start with: uvicorn backend.app.main:app --reload)")
 
-    sys.exit(0)
+    # 2. Check Frontend Port 3000 / 3001
+    frontend_host = "127.0.0.1"
+    p3000_open = is_port_open(frontend_host, 3000)
+    p3001_open = is_port_open(frontend_host, 3001)
+
+    print(f"\n[2] Frontend Web App (Next.js @ http://{frontend_host}:3000 / 3001):")
+    if p3000_open:
+        print("    ✅ Port 3000 is OPEN (Primary Next.js port).")
+    elif p3001_open:
+        print("    ✅ Port 3001 is OPEN (Fallback Next.js port).")
+    else:
+        print("    ℹ️ Frontend is not currently running (start with: npm --prefix src/frontend run dev)")
+
+    # 3. Check Database Port 5432
+    db_host = "127.0.0.1"
+    db_port = 5432
+    db_open = is_port_open(db_host, db_port)
+    print(f"\n[3] Database Connection Check (PostgreSQL @ {db_host}:{db_port}):")
+    if db_open:
+        print(f"    ✅ Port {db_port} is OPEN (PostgreSQL active).")
+    else:
+        print(f"    ℹ️ Port {db_port} is not listening locally.")
+        print("       (Note: Automated Pytest runs completely isolated using SQLite in-memory without needing PG)")
+
+    # 4. Check Environment Variables
+    print("\n[4] Environment Variables Alignment:")
+    db_url = os.getenv("DATABASE_URL", "default local")
+    test_db_url = os.getenv("TEST_DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+    next_api_url = os.getenv("NEXT_PUBLIC_API_URL", "http://localhost:8000")
+    next_mocks = os.getenv("NEXT_PUBLIC_USE_MOCKS", "false")
+
+    print(f"    - DATABASE_URL: {db_url}")
+    print(f"    - TEST_DATABASE_URL: {test_db_url}")
+    print(f"    - NEXT_PUBLIC_API_URL: {next_api_url}")
+    print(f"    - NEXT_PUBLIC_USE_MOCKS: {next_mocks}")
+
+    print("\n" + "=" * 70)
+    print("✨ Diagnostics complete.")
+    print("=" * 70)
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

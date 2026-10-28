@@ -1,0 +1,76 @@
+# ==============================================================================
+# CẤU HÌNH 3 CHỐT CHẶN PHÊ DUYỆT CỦA CON NGƯỜI (HUMAN-IN-THE-LOOP QUALITY GATES)
+# Hệ thống AI-Vibe-Coding (Google Antigravity 2.0)
+# ==============================================================================
+
+hitl_gates:
+  gate_1_prd:
+    id: "gate_1_prd_approval"
+    name: "Gate 1: Phê duyệt Yêu cầu & PRD (Client Scope & PRD Sign-off)"
+    stage: "post_discovery"
+    role_required: "Product Owner / Client Lead"
+    approver: "Product Owner / Client (User)"
+    responsible: "lead-ba"
+    description: >
+      Dừng lại sau khi Sub-Team 1 (Account Lead, Lead BA, UI/UX Designer) hoàn thành tài liệu
+      làm rõ yêu cầu, PRD và User Stories. Con người kiểm tra xem phạm vi (Scope), tính năng
+      và Acceptance Criteria (Gherkin) đã chính xác và đủ để triển khai chưa.
+    artifacts_to_review:
+      - "docs/specs/{slug}/prd.md"
+      - "docs/specs/{slug}/ui_ux_spec.md"
+      - "docs/specs/{slug}/ui_concept.md"
+      - "workspaces/artifacts/01_discovery/PRD.md"
+      - "workspaces/artifacts/01_discovery/user_stories.json"
+      - "workspaces/artifacts/01_discovery/clarification_qna.md"
+      - "workspaces/artifacts/01_discovery/ui_ux_specifications.md"
+    blocking: true
+
+  gate_2_architecture:
+    id: "gate_2_architecture_signoff"
+    name: "Gate 2: Phê duyệt Thiết kế Kiến trúc Kỹ thuật & API Contract"
+    stage: "post_architecture"
+    role_required: "Tech Lead / Principal Architect"
+    approver: "Tech Lead & System Architect"
+    responsible: "tech-planner"
+    description: >
+      Dừng lại sau khi Sub-Team 2 (System Architect, Security Architect, Tech Planner) hoàn thành
+      bản thiết kế kiến trúc, ERD, mô hình bảo mật STRIDE và API Contract (OpenAPI specification).
+      Con người kiểm tra việc chọn Tech Stack, thiết kế Database và ma trận phân quyền RBAC
+      trước khi cho phép các Dev Agents bắt đầu viết mã.
+    artifacts_to_review:
+      - "docs/specs/{slug}/plan.md"
+      - "docs/specs/{slug}/openapi.yaml"
+      - "docs/specs/{slug}/erd.mermaid"
+      - "docs/specs/{slug}/security_architecture.md"
+      - "docs/specs/{slug}/task_backlog_dag.json"
+      - "workspaces/artifacts/02_architecture/architecture_design.md"
+      - "workspaces/artifacts/02_architecture/openapi.yaml"
+      - "workspaces/artifacts/02_architecture/erd.mermaid"
+      - "workspaces/artifacts/02_architecture/security_architecture.md"
+      - "workspaces/artifacts/02_architecture/task_backlog_dag.json"
+    blocking: true
+
+  gate_3_deploy:
+    id: "gate_3_deploy_signoff"
+    name: "Gate 3: Cấp phép Triển khai & Nghiệm thu Bàn giao (Production Readiness)"
+    stage: "post_qa"
+    role_required: "Tech Lead / Release Manager"
+    approver: "Tech Lead"
+    responsible: "code-reviewer"
+    description: >
+      Dừng lại sau khi Sub-Team 4 (QA Tester, Code Reviewer) hoàn thành các bước review,
+      kiểm thử unit/e2e và rà soát lỗ hổng. Con người bấm nút phê duyệt cuối cùng
+      để hệ thống đóng gói, triển khai và bàn giao cho khách hàng (kèm User Manual, UAT Checklist).
+    artifacts_to_review:
+      - "docs/specs/{slug}/test-report.md"
+      - "docs/specs/{slug}/review-report.md"
+      - "docs/specs/{slug}/UAT_CHECKLIST.md"
+      - "docs/specs/{slug}/RELEASE_MANIFEST.json"
+      - "workspaces/artifacts/04_quality/code_review_report.md"
+      - "workspaces/artifacts/04_quality/test_summary.json"
+      - "workspaces/artifacts/04_quality/security_audit_report.md"
+      - "workspaces/artifacts/05_handover/client_handover_package.md"
+      - "workspaces/artifacts/05_handover/USER_MANUAL.md"
+      - "workspaces/artifacts/05_handover/UAT_CHECKLIST.md"
+      - "workspaces/artifacts/05_handover/RELEASE_MANIFEST.json"
+    blocking: true
