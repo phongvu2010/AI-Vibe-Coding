@@ -36,8 +36,46 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Standard HTTP Data Envelope Wrapper for Single / Array payloads.
+ */
+export interface ApiResponseWrapper<T> {
+  data: T;
+  message?: string;
+  status?: string | number;
+  success?: boolean;
+}
+
+/**
+ * Standard HTTP Paginated Collection Wrapper.
+ */
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  skip?: number;
+  limit?: number;
+}
+
+/**
+ * Normalizes response payloads that may be wrapped in an envelope.
+ */
+export function normalizeApiResponse<T>(payload: unknown): T {
+  if (payload && typeof payload === "object") {
+    const obj = payload as Record<string, unknown>;
+    if ("data" in obj && obj.data !== undefined) {
+      return obj.data as T;
+    }
+    if ("items" in obj && Array.isArray(obj.items)) {
+      return obj.items as T;
+    }
+  }
+  return payload as T;
+}
+
 export interface ApiRequestOptions extends RequestInit {
   mockData?: unknown;
+  /** Automatically unwrap { data: ... } or { items: ... } response envelope if present */
+  unwrap?: boolean;
   invalidateCache?: boolean;
 }
 
@@ -69,10 +107,11 @@ export async function apiRequest<T>(
   options?: ApiRequestOptions,
 ): Promise<T> {
   if (isMockMode() && options?.mockData !== undefined) {
-    return options.mockData as T;
+    const rawMock = options.mockData;
+    return options?.unwrap ? normalizeApiResponse<T>(rawMock) : (rawMock as T);
   }
 
-  const { mockData: _, invalidateCache, ...fetchOptions } = options ?? {};
+  const { mockData: _, unwrap, invalidateCache, ...fetchOptions } = options ?? {};
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -97,9 +136,11 @@ export async function apiRequest<T>(
   if (!response.ok) {
     let detail = `HTTP Error ${response.status}`;
     try {
-      const errBody = (await response.json()) as { detail?: string };
+      const errBody = (await response.json()) as { detail?: string | Array<{ loc?: string[]; msg?: string }> };
       if (typeof errBody.detail === "string") {
         detail = errBody.detail;
+      } else if (Array.isArray(errBody.detail)) {
+        detail = errBody.detail.map((err) => err.msg || JSON.stringify(err)).join(", ");
       }
     } catch {
       // Non-JSON response
@@ -111,5 +152,6 @@ export async function apiRequest<T>(
     return undefined as T;
   }
 
-  return (await response.json()) as T;
+  const jsonResult = (await response.json()) as unknown;
+  return unwrap ? normalizeApiResponse<T>(jsonResult) : (jsonResult as T);
 }

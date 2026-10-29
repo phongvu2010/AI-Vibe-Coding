@@ -12,8 +12,6 @@ skills:
   - requirement_parser
   - requirement_elicitation
   - gherkin_generator
-  - ba-requirements
-  - gherkin-generator
 mcp_servers:
   - gemini-notebook-mcp
 mainAgent: true

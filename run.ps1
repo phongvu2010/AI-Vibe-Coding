@@ -31,6 +31,7 @@ function Show-Help {
     Write-Host "========================================================================" -ForegroundColor Cyan
     Write-Host "  --- THỰC THI & KIỂM THỬ ---"
     Write-Host "  .\run.ps1 setup             : Khởi tạo virtualenv .venv và cài đặt dependencies"
+    Write-Host "  .\run.ps1 fix-env           : Tự động sửa shebang & đồng bộ đường dẫn .venv khi di chuyển thư mục"
     Write-Host "  .\run.ps1 dev               : Khởi chạy Backend FastAPI (Uvicorn reload)"
     Write-Host "  .\run.ps1 dev-quick         : Chạy tự động hóa toàn trình không dừng HITL (CI/CD mode)"
     Write-Host "  .\run.ps1 sdlc              : Chạy tương tác toàn trình 5 Phases với Human-in-the-Loop TUI"
@@ -102,6 +103,11 @@ switch ($Command.ToLower()) {
         } else {
             .\.venv\Scripts\pip.exe install -e ".[dev]"
         }
+        & $PythonBin scripts/fix_venv.py
+    }
+    "fix-env" {
+        Write-Host "🔧 Đang sửa và đồng bộ đường dẫn môi trường ảo .venv..." -ForegroundColor Green
+        & $PythonBin scripts/fix_venv.py
     }
     "dev" {
         Write-Host "🚀 Đang khởi động Backend FastAPI (Python: $PythonBin)..." -ForegroundColor Green

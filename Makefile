@@ -139,6 +139,7 @@ help:
 	@echo "  make docker-build-backend  : Đóng gói Docker Image cho Backend FastAPI"
 	@echo "  make docker-logs     : Xem logs thời gian thực của Docker Compose"
 	@echo "  make docker-down     : Dừng toàn bộ Docker containers"
+	@echo "  make fix-env         : Tự động sửa shebang & đồng bộ đường dẫn .venv khi di chuyển thư mục"
 	@echo "  make clean           : Dọn sạch cache và các tệp tạm (Đa nền tảng)"
 	@echo "=========================================================================="
 
@@ -151,6 +152,11 @@ setup:
 	else \
 		$(VENV_PYTHON_BIN) -m pip install -e ".[dev]"; \
 	fi
+	@$(PYTHON) scripts/fix_venv.py
+
+fix-env:
+	@echo "🔧 Đang sửa và đồng bộ đường dẫn môi trường ảo .venv..."
+	@$(PYTHON) scripts/fix_venv.py
 
 dev:
 	@echo "🚀 Đang khởi động Fullstack Servers (Python: $(PYTHON))..."

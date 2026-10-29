@@ -317,19 +317,9 @@ def test_integrated_advanced_capabilities(tmp_path: Path):
 def test_unified_template_enhancements():
     """Kiểm tra các tính năng nâng cao hợp nhất từ AI-Team-Dev và Multi-Agents-Dev."""
     skills_dir = BASE_DIR / ".agents" / "skills"
+    assert skills_dir.exists(), "Thư mục skills không tồn tại!"
 
-    # 1. Kiểm tra toàn bộ 12 Skill Aliases (kebab-case)
-    aliases = [
-        "ba-requirements", "backend-fastapi", "db-sqlalchemy-alembic",
-        "frontend-nextjs", "gherkin-generator", "mobile-react-native",
-        "secret-scanner", "threat-modeling", "threat_modeling",
-        "uat-checklist-builder", "test_runner", "test-runner"
-    ]
-    for alias in aliases:
-        skill_file = skills_dir / alias / "SKILL.md"
-        assert skill_file.exists(), f"Thiếu skill alias: {alias}"
-
-    # 2. Kiểm tra hàm bóc tách plan matrix và kiểm tra camelCase trong verify_contracts
+    # 1. Kiểm tra hàm bóc tách plan matrix và kiểm tra camelCase trong verify_contracts
     from scripts.verify_contracts import extract_plan_matrix_fields, is_camel_case, is_snake_case
     plan_path = BASE_DIR / "docs" / "specs" / "motocare-booking" / "plan.md"
     assert plan_path.exists()

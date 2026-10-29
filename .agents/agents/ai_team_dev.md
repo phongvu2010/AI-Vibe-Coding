@@ -5,10 +5,8 @@ model: flash
 description: "Sub-Team Fast-Track tích hợp triết lý AI Team Dev (Producer Remy, Dev Nova/Sage/Milo, QA Ivy) để giải quyết các task nhanh, bugfix, thêm tính năng cục bộ mà không cần đi qua toàn bộ chu trình 5 phases SDLC."
 skills:
   - test_runner_suite
-  - test-runner
-  - code-review-evaluator
+  - code_review_evaluator
   - secret_scanner
-  - secret-scanner
 mcp_servers:
   - gemini-api_gemini-api-docs
 tools:

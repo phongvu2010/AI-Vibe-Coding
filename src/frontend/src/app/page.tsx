@@ -2,24 +2,49 @@
 
 import React, { useState, useEffect } from 'react';
 import { User } from '../types/user';
-import { mockUsers } from '../lib/api/mocks/user_mock';
+import { mockUsers, mockWrappedUsers } from '../lib/api/mocks/user_mock';
 import { UserCard, UIState } from '../components/UserCard';
+import { apiRequest, ApiError, isMockMode } from '../lib/api/client';
 
 export default function HomePage() {
   const [users, setUsers] = useState<User[]>([]);
   const [state, setState] = useState<UIState>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [mockActive, setMockActive] = useState<boolean>(false);
 
   const loadData = async () => {
     setState('loading');
+    setErrorMessage('');
     try {
-      // Giả lập nạp dữ liệu (Ưu tiên Mock ở Wave 1, chuyển Live API ở Wave 2)
-      setTimeout(() => {
-        setUsers(mockUsers);
-        setState(mockUsers.length > 0 ? 'success' : 'empty');
-      }, 600);
-    } catch {
-      setErrorMessage('Không thể kết nối tới Backend API.');
+      // Wave 1 Mock Interception: apiRequest tự động trả về mockData khi USE_MOCKS=true,
+      // hoặc kết nối Live Backend API (/api/v1/users) khi ở Wave 2 live mode.
+      const data = await apiRequest<User[]>('/api/v1/users', {
+        mockData: mockWrappedUsers,
+        unwrap: true,
+      });
+
+      // Chuẩn hóa dữ liệu linh hoạt (Direct Array hoặc Wrapped Response Envelope)
+      let list: User[] = [];
+      if (Array.isArray(data)) {
+        list = data;
+      } else if (data && typeof data === 'object') {
+        const anyObj = data as Record<string, unknown>;
+        if (Array.isArray(anyObj.items)) {
+          list = anyObj.items as User[];
+        } else if (Array.isArray(anyObj.data)) {
+          list = anyObj.data as User[];
+        }
+      }
+
+      setUsers(list);
+      setMockActive(isMockMode());
+      setState(list.length > 0 ? 'success' : 'empty');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrorMessage(`Lỗi Backend API (${err.status}): ${err.detail}`);
+      } else {
+        setErrorMessage(err instanceof Error ? err.message : 'Không thể kết nối tới Backend API.');
+      }
       setState('error');
     }
   };
@@ -44,7 +69,16 @@ export default function HomePage() {
 
       <section className="space-y-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-slate-800">Danh Sách Thành Viên (Wave 1 Mock)</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-slate-800">Danh Sách Thành Viên</h2>
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                mockActive ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+              }`}
+            >
+              {mockActive ? 'Wave 1 Mock Mode' : 'Wave 2 Live Mode'}
+            </span>
+          </div>
           <button
             onClick={loadData}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"

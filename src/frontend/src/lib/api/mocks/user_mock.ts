@@ -1,4 +1,5 @@
 import { User } from '../../../types/user';
+import type { PaginatedResponse, ApiResponseWrapper } from '../client';
 
 export const mockUsers: User[] = [
   {
@@ -18,3 +19,23 @@ export const mockUsers: User[] = [
     updated_at: "2026-10-17T09:30:00Z",
   },
 ];
+
+/**
+ * Wave 1 Mock Fixture: Chuẩn HTTP Paginated Response Envelope
+ */
+export const mockPaginatedUsers: PaginatedResponse<User> = {
+  items: mockUsers,
+  total: mockUsers.length,
+  skip: 0,
+  limit: 100,
+};
+
+/**
+ * Wave 1 Mock Fixture: Chuẩn HTTP Data Envelope Wrapper
+ */
+export const mockWrappedUsers: ApiResponseWrapper<User[]> = {
+  data: mockUsers,
+  status: 200,
+  message: "Users retrieved successfully",
+  success: true,
+};

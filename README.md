@@ -188,23 +188,19 @@ AI-Vibe-Coding/
 ├── templates/                               # Kho Presets Client kế thừa từ AI-Team-Dev
 │   └── presets/                             # Next.js 15, React Vite, React Native Expo
 │
-├── orchestrator/                            # Động cơ điều phối SDLC & Compatibility Shims (kế thừa từ Multi-Agents-Dev)
-│   ├── runner.py                            # Headless & Interactive SDLC CLI Runner
+├── docs/                                    # Hồ sơ bóc tách theo tính năng (docs/specs/<slug>/)
+├── scripts/                                 # Động cơ điều phối SDLC, Automation Day-0, Checkpoints, Presets & Release
+│   ├── runner.py                            # Headless & Interactive SDLC Multi-Agent Runner
 │   ├── fast_track.py                        # Động cơ Track 2 Fast-Track (Tactical Agile Squad)
 │   ├── dag_engine.py                        # Động cơ đồ thị phân giải phụ thuộc Wave DAG
 │   ├── synthesis_engine.py                  # Adaptive Code Synthesizer (Gemini API & AST)
 │   ├── hitl.py                              # Human-in-the-Loop Review Gate Generator
 │   ├── persistence.py & state.py            # SQLite State Machine & Checkpoints
-│   └── sync_state.py                        # Cơ chế quét mã nguồn và đồng bộ ngược State
-│
-├── docs/                                    # Hồ sơ bóc tách theo tính năng (docs/specs/<slug>/)
-├── scripts/                                 # Bộ công cụ tự động hóa Day-0, Checkpoints, Presets, Test & Release
 │   ├── setup_frontend.py                    # Chuyển đổi linh hoạt Web Vite / Next.js / Mobile Expo
 │   ├── checkpoint.py                        # Quản lý State Checkpoints, Session Resume & Rollback
 │   ├── sync_state.py                        # Quét mã nguồn và đồng bộ ngược vào State Checkpoint
 │   ├── snapshot.py                          # Chụp nhanh mã nguồn < 1s
 │   ├── smoke_test.py / .sh / .ps1           # Kiểm thử tự động 5 tầng (Python / Bash / PowerShell)
-│   ├── fast_track.py                        # Thực thi Fast-Track cho micro-tasks
 │   └── bundle_release.py                    # Đóng gói bản phát hành (.zip, SHA-256 checksum, manifest, docs)
 │
 ├── src/                                     # Toàn bộ mã nguồn thực tế (In-Place Development Mode)

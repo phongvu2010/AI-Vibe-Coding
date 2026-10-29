@@ -40,9 +40,15 @@ dev = [
     "ruff>=0.5.0",
 ]
 
+[project.scripts]
+vibe = "vibe:main"
+
+[tool.setuptools]
+py-modules = ["vibe"]
+
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["orchestrator*", "scripts*"]
+include = ["scripts*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

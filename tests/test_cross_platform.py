@@ -43,9 +43,9 @@ def test_scripts_file_io_uses_utf8_encoding():
 
 
 def test_all_file_io_uses_utf8_encoding():
-    """Kiểm tra tĩnh AST toàn bộ mã nguồn orchestrator & src bảo đảm luôn khai báo encoding='utf-8'."""
+    """Kiểm tra tĩnh AST toàn bộ mã nguồn scripts & src bảo đảm luôn khai báo encoding='utf-8'."""
     py_files = [
-        f for f in list((BASE_DIR / "orchestrator").rglob("*.py")) + list((BASE_DIR / "src").rglob("*.py"))
+        f for f in list((BASE_DIR / "scripts").rglob("*.py")) + list((BASE_DIR / "src").rglob("*.py"))
         if "__pycache__" not in str(f)
     ]
     assert len(py_files) > 0

@@ -1,0 +1,8 @@
+#!/bin/sh
+# AI-Vibe-Coding CLI Launcher
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$ROOT_DIR/.venv/bin/python" ]; then
+    exec "$ROOT_DIR/.venv/bin/python" "$ROOT_DIR/vibe.py" "$@"
+else
+    exec python3 "$ROOT_DIR/vibe.py" "$@"
+fi

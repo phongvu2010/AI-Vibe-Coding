@@ -12,13 +12,13 @@ Bảo mật: STRIDE Threat Model & Ma trận RBAC.
 
 ## 📂 DANH SÁCH ARTIFACTS CẦN THẨM ĐỊNH
 
-| STT | Tập Tin / Tài Liệu | Đường Dẫn Tuyệt Đối | Dung Lượng | Trạng Thái |
+| STT | Tập Tin / Tài Liệu | Đường Dẫn | Dung Lượng | Trạng Thái |
 |---|---|---|---|---|
-| 1 | [architecture_design.md](/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/architecture_design.md) | `/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/architecture_design.md` | 3,883 bytes | ✅ Sẵn sàng |
-| 2 | [openapi.yaml](/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/openapi.yaml) | `/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/openapi.yaml` | 1,040 bytes | ✅ Sẵn sàng |
-| 3 | [erd.mermaid](/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/erd.mermaid) | `/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/erd.mermaid` | 533 bytes | ✅ Sẵn sàng |
-| 4 | [security_architecture.md](/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/security_architecture.md) | `/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/security_architecture.md` | 711 bytes | ✅ Sẵn sàng |
-| 5 | [task_backlog_dag.json](/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/task_backlog_dag.json) | `/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/02_architecture/task_backlog_dag.json` | 999 bytes | ✅ Sẵn sàng |
+| 1 | [architecture_design.md](workspaces/artifacts/02_architecture/architecture_design.md) | `workspaces/artifacts/02_architecture/architecture_design.md` | 3,883 bytes | ✅ Sẵn sàng |
+| 2 | [openapi.yaml](workspaces/artifacts/02_architecture/openapi.yaml) | `workspaces/artifacts/02_architecture/openapi.yaml` | 1,040 bytes | ✅ Sẵn sàng |
+| 3 | [erd.mermaid](workspaces/artifacts/02_architecture/erd.mermaid) | `workspaces/artifacts/02_architecture/erd.mermaid` | 533 bytes | ✅ Sẵn sàng |
+| 4 | [security_architecture.md](workspaces/artifacts/02_architecture/security_architecture.md) | `workspaces/artifacts/02_architecture/security_architecture.md` | 711 bytes | ✅ Sẵn sàng |
+| 5 | [task_backlog_dag.json](workspaces/artifacts/02_architecture/task_backlog_dag.json) | `workspaces/artifacts/02_architecture/task_backlog_dag.json` | 999 bytes | ✅ Sẵn sàng |
 
 ---
 

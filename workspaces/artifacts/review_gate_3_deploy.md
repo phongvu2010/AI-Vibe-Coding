@@ -10,11 +10,11 @@ Tất cả test suite và kiểm tra an toàn bảo mật đã hoàn tất. Yêu
 
 ## 📂 DANH SÁCH ARTIFACTS CẦN THẨM ĐỊNH
 
-| STT | Tập Tin / Tài Liệu | Đường Dẫn Tuyệt Đối | Dung Lượng | Trạng Thái |
+| STT | Tập Tin / Tài Liệu | Đường Dẫn | Dung Lượng | Trạng Thái |
 |---|---|---|---|---|
-| 1 | [code_review_report.md](/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/04_quality/code_review_report.md) | `/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/04_quality/code_review_report.md` | 1,983 bytes | ✅ Sẵn sàng |
-| 2 | [test_summary.json](/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/04_quality/test_summary.json) | `/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/04_quality/test_summary.json` | 574 bytes | ✅ Sẵn sàng |
-| 3 | [security_audit_report.md](/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/04_quality/security_audit_report.md) | `/Users/hunterdo/Documents/Python Project/Multi-Agents-Dev/workspaces/artifacts/04_quality/security_audit_report.md` | 1,149 bytes | ✅ Sẵn sàng |
+| 1 | [code_review_report.md](workspaces/artifacts/04_quality/code_review_report.md) | `workspaces/artifacts/04_quality/code_review_report.md` | 1,983 bytes | ✅ Sẵn sàng |
+| 2 | [test_summary.json](workspaces/artifacts/04_quality/test_summary.json) | `workspaces/artifacts/04_quality/test_summary.json` | 574 bytes | ✅ Sẵn sàng |
+| 3 | [security_audit_report.md](workspaces/artifacts/04_quality/security_audit_report.md) | `workspaces/artifacts/04_quality/security_audit_report.md` | 1,149 bytes | ✅ Sẵn sàng |
 
 ---
 

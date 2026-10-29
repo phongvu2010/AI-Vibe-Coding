@@ -78,8 +78,49 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Standard HTTP Data Envelope Wrapper for Single / Array payloads.
+ */
+export interface ApiResponseWrapper<T> {
+  data: T;
+  message?: string;
+  status?: string | number;
+  success?: boolean;
+}
+
+/**
+ * Standard HTTP Paginated Collection Wrapper.
+ */
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  skip?: number;
+  limit?: number;
+}
+
+/**
+ * Normalizes response payloads that may be wrapped in an envelope:
+ * - Direct payload: returns as-is
+ * - Envelope with 'data' property: unwraps and returns 'data'
+ * - Paginated wrapper with 'items' array: unwraps and returns 'items'
+ */
+export function normalizeApiResponse<T>(payload: unknown): T {
+  if (payload && typeof payload === "object") {
+    const obj = payload as Record<string, unknown>;
+    if ("data" in obj && obj.data !== undefined) {
+      return obj.data as T;
+    }
+    if ("items" in obj && Array.isArray(obj.items)) {
+      return obj.items as T;
+    }
+  }
+  return payload as T;
+}
+
 export interface ApiRequestOptions extends RequestInit {
   mockData?: unknown;
+  /** Automatically unwrap { data: ... } or { items: ... } response envelope if present */
+  unwrap?: boolean;
   /** Force cache busting / bypass Next.js 15 fetch and client router cache */
   invalidateCache?: boolean;
 }
@@ -170,10 +211,11 @@ export async function apiRequest<T>(
 ): Promise<T> {
   // Wave 1 Mock Interception: If mock mode is enabled and mockData is provided, return it directly
   if (isMockMode() && options?.mockData !== undefined) {
-    return options.mockData as T;
+    const rawMock = options.mockData;
+    return options?.unwrap ? normalizeApiResponse<T>(rawMock) : (rawMock as T);
   }
 
-  const { mockData: _, invalidateCache, ...fetchOptions } = options ?? {};
+  const { mockData: _, unwrap, invalidateCache, ...fetchOptions } = options ?? {};
 
   // Next.js 15 Cache Invalidation: Default to 'no-store' in live mode to avoid stale mock or stale data
   const cacheStrategy: RequestCache =
@@ -206,9 +248,11 @@ export async function apiRequest<T>(
   if (!response.ok) {
     let detail = `HTTP Error ${response.status}`;
     try {
-      const errBody = (await response.json()) as { detail?: string };
+      const errBody = (await response.json()) as { detail?: string | Array<{ loc?: string[]; msg?: string }> };
       if (typeof errBody.detail === "string") {
         detail = errBody.detail;
+      } else if (Array.isArray(errBody.detail)) {
+        detail = errBody.detail.map((err) => err.msg || JSON.stringify(err)).join(", ");
       }
     } catch {
       // Fallback to status message if body is not JSON
@@ -220,7 +264,8 @@ export async function apiRequest<T>(
     return undefined as T;
   }
 
-  return (await response.json()) as T;
+  const jsonResult = (await response.json()) as unknown;
+  return unwrap ? normalizeApiResponse<T>(jsonResult) : (jsonResult as T);
 }
 
 /**

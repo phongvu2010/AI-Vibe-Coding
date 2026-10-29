@@ -127,7 +127,7 @@ export const MOCK_<RESOURCE>S: <Resource>[] = [
 ```
 
 ### 4.4. Bảo Mật, Phân Quyền RBAC & STRIDE Threat Modeling
-> Tham chiếu chi tiết kỹ năng: [`.agents/skills/threat-modeling/SKILL.md`](../../threat-modeling/SKILL.md)
+> Tham chiếu chi tiết kỹ năng: [`.agents/skills/threat_modeling_stride/SKILL.md`](../../threat_modeling_stride/SKILL.md)
 
 #### Bảng Phân Tích Mối Đe Dọa STRIDE:
 | Ký Hiệu | Mối Đe Dọa | Kịch Bản Rủi Ro | Biện Pháp Khắc Phục (Mitigation) |

@@ -1,10 +1,10 @@
 {
   "vibe-coding-guardrails-reminder": {
-    "enabled": false,
+    "enabled": true,
     "PreInvocation": [
       {
         "type": "command",
-        "command": "echo '{\"injectSteps\":[{\"ephemeralMessage\":\"[VIBE CODING GUARDRAILS] Adhere to Clean Architecture 5 layers (models->schemas->repos->services->routers), strict snake_case across all layers, Zero Hardcoded Secrets, and 5 UI states (loading, empty, error, success, default).\"}]}'",
+        "command": "python -c \"import json; print(json.dumps({'injectSteps':[{'ephemeralMessage':'[VIBE CODING GUARDRAILS] Adhere to Clean Architecture 5 layers (models->schemas->repos->services->routers), strict snake_case across all layers, Zero Hardcoded Secrets, and 5 UI states (loading, empty, error, success, default).'}]}))\"",
         "timeout": 5
       }
     ]
@@ -14,13 +14,13 @@
     "PreInvocation": [
       {
         "type": "command",
-        "command": "echo '{\"injectSteps\":[{\"ephemeralMessage\":\"[CHECKPOINT REMINDER] Remember to run make sync or python scripts/sync_state.py after source code modifications to persist updates into SDLC SQLite checkpoints.\"}]}'",
+        "command": "python -c \"import json; print(json.dumps({'injectSteps':[{'ephemeralMessage':'[CHECKPOINT REMINDER] Remember to run make sync or python scripts/sync_state.py after source code modifications to persist updates into SDLC SQLite checkpoints.'}]}))\"",
         "timeout": 5
       }
     ]
   },
   "post-tool-audit": {
-    "enabled": false,
+    "enabled": true,
     "PostToolUse": [
       {
         "matcher": "run_command",
@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"audit\":\"Command executed. State synchronizer and audit trail active.\"}'",
+            "command": "python -c \"import json; print(json.dumps({'audit':'Command executed. State synchronizer and audit trail active.'}))\"",
             "timeout": 5
           }
         ]

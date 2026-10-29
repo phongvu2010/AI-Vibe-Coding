@@ -1,17 +1,27 @@
 import asyncio
 import os
+import sys
 from logging.config import fileConfig
+from pathlib import Path
 
 from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+# Đảm bảo Project Root và src/ nằm trong sys.path để 'src.db' lẫn 'db' đều import được ở mọi ngữ cảnh thực thi
+BASE_DIR = Path(__file__).resolve().parents[3]
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+SRC_DIR = BASE_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
 # Import Base and models for Alembic autogenerate
-from src.db.base import Base
+from src.db.base import Base  # noqa: E402
 
 try:
-    import src.db.models  # noqa: F401
+    import src.db.models  # noqa: E402, F401
 except ImportError:
     pass
 
